@@ -69,3 +69,19 @@
 - **② AI 提示词与修改**：见 `prompts.md`「界面设计」2b。要点：Key 不入 Room 表，单独加密存储（设计文档"第三方库"已说明 security-crypto）。
 - **③ 问题与解决**：无（一次编译通过）。历史页目前为空，将在阶段 4 接入 DeepSeek 后产生记录。
 - **验证（✅ 通过）**：`./gradlew :app:assembleDebug` BUILD SUCCESSFUL（31s）。阶段 2（2a+2b）完成，6 页齐全；进入阶段 3（ContentProvider）。
+
+---
+
+## 阶段 3｜ContentProvider
+
+### `feat(provider): ScheduleProvider 全4项 + 看板页改经 ContentProvider 读取`
+
+- **① 做了什么**：
+  - `provider/ScheduleProvider`：暴露 events 表，URI `content://com.qiu.aischedule.provider/events`（列表）与 `/events/{id}`（单条）；实现 query/insert/update/delete 全 4 项 + `getType`；`UriMatcher` 区分列表/单条。
+  - `EventDao` 增加 `getAllCursor/getByIdCursor`（返回 Cursor），`update/delete` 改返回 `int`。
+  - `ScheduleRepository`：事件写入后 `notifyChange`。
+  - `ScheduleListActivity`：改为经 `ContentResolver.query` 读取 + `ContentObserver` 自动刷新（直接在 UI 体现 CP 用法）。
+  - Manifest 注册 provider（`exported=true`，便于 adb 验证与视频演示）。
+- **② AI 提示词与修改**：见 `prompts.md`「ContentProvider」。
+- **③ 问题与解决**：CP 方法运行在调用方线程，需在非主线程访问 Room → 看板页查询放在 `AppExecutors.diskIO()`。
+- **验证（✅ 通过）**：`assembleDebug` 成功（37s）；运行时 `adb content query / insert / delete` 全部成功（插入→查到→删除→清空），无崩溃。阶段 3 结束，进入阶段 4（DeepSeek 网络）。

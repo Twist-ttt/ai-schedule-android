@@ -11,27 +11,31 @@ import com.qiu.aischedule.data.local.dao.HistoryDao;
 import com.qiu.aischedule.data.local.entity.ApiConfig;
 import com.qiu.aischedule.data.local.entity.EventRecord;
 import com.qiu.aischedule.data.local.entity.ParseHistory;
+import com.qiu.aischedule.provider.ScheduleProvider;
 import com.qiu.aischedule.util.AppExecutors;
 
 import java.util.List;
 
 /**
- * 数据层统一入口。UI 只与 Repository 交互，不直接接触 DAO / 数据库。
- * - 读：返回 LiveData，UI 端 observe 自动刷新；
- * - 写：经 {@link AppExecutors#diskIO()} 切到后台线程，避免主线程访问数据库报错；
+ * 数据层统一入口。UI 只与 Repository 交互，不直接接触 DAO / 数据库 / ContentProvider。
+ * - 读：返回 LiveData；
+ * - 写：经 {@link AppExecutors#diskIO()} 切到后台线程，并在事件写入后
+ *   {@code notifyChange}，使通过 ContentProvider 观察的看板页自动刷新；
  * - 同步读：getEventSync/getApiConfigSync 必须在后台线程调用（如通知、详情预取）。
  */
 public class ScheduleRepository {
 
     private static volatile ScheduleRepository INSTANCE;
 
+    private final Context appContext;
     private final EventDao eventDao;
     private final HistoryDao historyDao;
     private final ApiConfigDao apiConfigDao;
     private final AppExecutors executors;
 
     private ScheduleRepository(Context context) {
-        AppDatabase db = AppDatabase.getInstance(context);
+        this.appContext = context.getApplicationContext();
+        AppDatabase db = AppDatabase.getInstance(appContext);
         this.eventDao = db.eventDao();
         this.historyDao = db.historyDao();
         this.apiConfigDao = db.apiConfigDao();
@@ -55,10 +59,6 @@ public class ScheduleRepository {
         return eventDao.getAll();
     }
 
-    public LiveData<List<EventRecord>> getEventsByDay(long dayStart, long dayEnd) {
-        return eventDao.getByDayRange(dayStart, dayEnd);
-    }
-
     public LiveData<EventRecord> observeEvent(long id) {
         return eventDao.observeById(id);
     }
@@ -71,18 +71,27 @@ public class ScheduleRepository {
         return apiConfigDao.observe();
     }
 
-    // ---------- 写（后台线程） ----------
+    // ---------- 写（后台线程；事件写入后通知 ContentProvider 观察者） ----------
 
     public void insertEvent(EventRecord event) {
-        executors.diskIO().execute(() -> eventDao.insert(event));
+        executors.diskIO().execute(() -> {
+            eventDao.insert(event);
+            notifyEventsChanged();
+        });
     }
 
     public void updateEvent(EventRecord event) {
-        executors.diskIO().execute(() -> eventDao.update(event));
+        executors.diskIO().execute(() -> {
+            eventDao.update(event);
+            notifyEventsChanged();
+        });
     }
 
     public void deleteEvent(EventRecord event) {
-        executors.diskIO().execute(() -> eventDao.delete(event));
+        executors.diskIO().execute(() -> {
+            eventDao.delete(event);
+            notifyEventsChanged();
+        });
     }
 
     public void insertHistory(ParseHistory history) {
@@ -124,6 +133,10 @@ public class ScheduleRepository {
             final EventRecord event = eventDao.getByIdSync(id);
             executors.mainThread().execute(() -> callback.onResult(event));
         });
+    }
+
+    private void notifyEventsChanged() {
+        appContext.getContentResolver().notifyChange(ScheduleProvider.CONTENT_URI_EVENTS, null);
     }
 
     /** 通用回调接口（避免依赖 java.util.function）。 */

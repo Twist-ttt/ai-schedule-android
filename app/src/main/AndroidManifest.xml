@@ -40,6 +40,12 @@
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/settings_title" />
+
+        <!-- 日程数据 ContentProvider：以 URI 暴露 events 表（exported=true 便于演示与 adb 验证） -->
+        <provider
+            android:name=".provider.ScheduleProvider"
+            android:authorities="com.qiu.aischedule.provider"
+            android:exported="true" />
     </application>
 
 </manifest>

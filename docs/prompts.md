@@ -77,7 +77,15 @@
 
 ## ContentProvider
 
-（阶段 3 起补充。）
+### 第 3 轮（阶段 3，对应 commit `feat(provider): ScheduleProvider 全4项 + 看板页改经 CP 读取`）
+
+- **提示词原文**：「实现 ContentProvider 暴露 events 表，URI 形式 `content://com.qiu.aischedule.provider/events` 与 `/events/{id}`，实现 query/insert/update/delete 全部 4 项；看板页改为通过 `ContentResolver.query` 读取并用 ContentObserver 在数据变更时刷新；写入仍走 Repository 并 notifyChange。」
+- **解决的问题**：满足"加入 ContentProvider，实现≥2 项数据访问"，并让 CP 在应用流程里真正被使用（便于视频演示）。
+- **AI 生成结果与我的修改**：
+  - DAO 增加 `getAllCursor()/getByIdCursor()` 返回 `Cursor`（Room 支持），CP 直接返回 Cursor；`update/delete` 改返回 `int`（受影响行数）。
+  - Provider 用 `UriMatcher` 区分列表/单条 URI，`getType` 返回标准 MIME。
+  - Repository 事件写入后 `notifyChange(CONTENT_URI_EVENTS)`；看板页用 `ContentObserver` 自动重新查询。
+  - **运行时验证**：`adb shell content query / insert / delete` 全部成功（插入后查到 → 删除后清空），无崩溃。
 
 ## 网络访问
 

@@ -1,5 +1,7 @@
 package com.qiu.aischedule.data.local.dao;
 
+import android.database.Cursor;
+
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -13,8 +15,9 @@ import java.util.List;
 
 /**
  * 日程表的数据访问对象。
- * - 读操作返回 LiveData，UI 端 observe 后数据变更自动刷新；
- * - 同步查询 getByIdSync 供详情页/通知在后台线程预取使用。
+ * - 读操作返回 LiveData，详情页 observe 后数据变更自动刷新；
+ * - 同步查询 getByIdSync 供 ContentProvider/通知在后台线程使用；
+ * - getAllCursor/getByIdCursor 返回 Cursor，供 ContentProvider 直接对外暴露。
  */
 @Dao
 public interface EventDao {
@@ -23,10 +26,10 @@ public interface EventDao {
     long insert(EventRecord event);
 
     @Update
-    void update(EventRecord event);
+    int update(EventRecord event);
 
     @Delete
-    void delete(EventRecord event);
+    int delete(EventRecord event);
 
     @Query("SELECT * FROM events ORDER BY startTime ASC")
     LiveData<List<EventRecord>> getAll();
@@ -39,6 +42,12 @@ public interface EventDao {
 
     @Query("SELECT * FROM events WHERE id = :id")
     EventRecord getByIdSync(long id);
+
+    @Query("SELECT * FROM events ORDER BY startTime ASC")
+    Cursor getAllCursor();
+
+    @Query("SELECT * FROM events WHERE id = :id")
+    Cursor getByIdCursor(long id);
 
     @Query("SELECT COUNT(*) FROM events")
     int count();

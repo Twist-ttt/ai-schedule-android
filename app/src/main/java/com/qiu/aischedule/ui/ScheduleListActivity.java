@@ -1,7 +1,11 @@
 package com.qiu.aischedule.ui;
 
 import android.content.Intent;
+import android.database.ContentObserver;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,7 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.qiu.aischedule.R;
 import com.qiu.aischedule.data.local.entity.EventRecord;
 import com.qiu.aischedule.data.repository.ScheduleRepository;
+import com.qiu.aischedule.provider.ScheduleProvider;
 import com.qiu.aischedule.ui.adapter.EventAdapter;
+import com.qiu.aischedule.util.AppExecutors;
 import com.qiu.aischedule.util.DateUtils;
 
 import java.util.ArrayList;
@@ -24,25 +30,24 @@ import java.util.List;
 
 /**
  * 日历看板页（RecyclerView 页）。
- * 上方 CalendarView 选日期，下方 RecyclerView 展示当天日程。
- * 数据来自 Room 的 LiveData：observe 全部日程后按所选日期过滤，
- * 数据增删改后自动刷新（满足"修改/删除后界面如何刷新"）。
+ * 阶段 3：数据通过 **ContentProvider** 读取——用 ContentResolver.query 经 URI 获取 Cursor，
+ * 再映射为 EventRecord。注册 ContentObserver：Repository 写入并 notifyChange 后自动重新查询刷新。
+ * 这样既满足"ContentProvider 通过 URI 访问数据"，又保留"修改/删除后界面刷新"。
  */
 public class ScheduleListActivity extends AppCompatActivity {
 
-    private ScheduleRepository repo;
-    private EventAdapter adapter;
     private final List<EventRecord> allEvents = new ArrayList<>();
     private long selectedDayStart;
 
+    private EventAdapter adapter;
     private TextView tvEmpty;
+    private ContentObserver observer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_list);
 
-        repo = ScheduleRepository.getInstance(this);
         selectedDayStart = DateUtils.todayStart();
 
         RecyclerView rv = findViewById(R.id.rvEvents);
@@ -73,14 +78,65 @@ public class ScheduleListActivity extends AppCompatActivity {
         findViewById(R.id.fabAdd).setOnClickListener(v ->
                 startActivity(new Intent(this, AiConfirmActivity.class)));
 
-        // 关键：observe LiveData，数据变化自动回调刷新
-        repo.getEventsAll().observe(this, events -> {
-            allEvents.clear();
-            if (events != null) {
-                allEvents.addAll(events);
+        // 通过 ContentProvider 读取
+        loadFromProvider();
+
+        // 观察事件变化（Repository 写入后 notifyChange）→ 自动刷新
+        observer = new ContentObserver(new Handler(Looper.getMainLooper())) {
+            @Override
+            public void onChange(boolean selfChange) {
+                loadFromProvider();
             }
-            applyFilter();
+        };
+        getContentResolver().registerContentObserver(ScheduleProvider.CONTENT_URI_EVENTS, true, observer);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (observer != null) {
+            getContentResolver().unregisterContentObserver(observer);
+        }
+        super.onDestroy();
+    }
+
+    /** 经 ContentResolver 查询 events 表，后台线程读 Cursor，回主线程刷新。 */
+    private void loadFromProvider() {
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            List<EventRecord> list = new ArrayList<>();
+            Cursor cursor = null;
+            try {
+                cursor = getContentResolver().query(
+                        ScheduleProvider.CONTENT_URI_EVENTS, null, null, null, null);
+                if (cursor != null) {
+                    while (cursor.moveToNext()) {
+                        list.add(fromCursor(cursor));
+                    }
+                }
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+            final List<EventRecord> result = list;
+            AppExecutors.getInstance().mainThread().execute(() -> {
+                allEvents.clear();
+                allEvents.addAll(result);
+                applyFilter();
+            });
         });
+    }
+
+    private static EventRecord fromCursor(Cursor c) {
+        EventRecord e = new EventRecord();
+        e.id = c.getLong(c.getColumnIndexOrThrow("id"));
+        e.title = c.getString(c.getColumnIndexOrThrow("title"));
+        e.startTime = c.getLong(c.getColumnIndexOrThrow("startTime"));
+        e.endTime = c.getLong(c.getColumnIndexOrThrow("endTime"));
+        e.location = c.getString(c.getColumnIndexOrThrow("location"));
+        e.reminderMinutes = c.getInt(c.getColumnIndexOrThrow("reminderMinutes"));
+        e.sourceText = c.getString(c.getColumnIndexOrThrow("sourceText"));
+        e.status = c.getString(c.getColumnIndexOrThrow("status"));
+        return e;
     }
 
     @Override
