@@ -12,6 +12,7 @@
     <!-- 菜单 -->
     <string name="menu_history">解析历史</string>
     <string name="menu_settings">设置</string>
+    <string name="menu_test_notify">测试通知（5秒后）</string>
 
     <!-- 确认页 -->
     <string name="confirm_title">确认日程</string>
@@ -55,6 +56,12 @@
     <string name="event_no_location">未设置地点</string>
     <string name="event_no_reminder">不提醒</string>
     <string name="event_reminder_suffix">分钟前提醒</string>
+
+    <!-- 通知 -->
+    <string name="notif_channel_name">日程提醒</string>
+    <string name="notif_test_title">测试提醒</string>
+    <string name="notif_test_text">这是 AlarmManager 定时 + Notification 的提醒测试</string>
+    <string name="toast_test_scheduled">5 秒后将弹出测试通知</string>
 
     <!-- Toast -->
     <string name="toast_saved">已保存日程</string>

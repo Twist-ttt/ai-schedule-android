@@ -9,12 +9,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.qiu.aischedule.R;
 import com.qiu.aischedule.data.local.entity.EventRecord;
 import com.qiu.aischedule.data.repository.ScheduleRepository;
+import com.qiu.aischedule.notify.ReminderScheduler;
 import com.qiu.aischedule.util.DateUtils;
 
 /**
  * 详情编辑页：查看 / 修改 / 删除单条日程。
- * 通过 LiveData observe 单条记录填充字段；更新与删除经 Repository 后台执行，
- * 看板页的 LiveData 观察会自动收到变化并刷新。
+ * 更新后重新设置提醒；删除后取消提醒。看板页经 ContentProvider 自动刷新。
  */
 public class DetailActivity extends AppCompatActivity {
 
@@ -75,6 +75,7 @@ public class DetailActivity extends AppCompatActivity {
             current.location = etLocation.getText().toString().trim();
             current.reminderMinutes = parseInt(etReminder.getText().toString().trim());
             repo.updateEvent(current);
+            reschedule(current);
             Toast.makeText(this, R.string.toast_updated, Toast.LENGTH_SHORT).show();
             finish();
         });
@@ -83,10 +84,24 @@ public class DetailActivity extends AppCompatActivity {
             if (current == null) {
                 return;
             }
+            ReminderScheduler.cancel(this, current.id);
             repo.deleteEvent(current);
             Toast.makeText(this, R.string.toast_deleted, Toast.LENGTH_SHORT).show();
             finish();
         });
+    }
+
+    private void reschedule(EventRecord e) {
+        if (e.reminderMinutes > 0) {
+            long trigger = e.startTime - e.reminderMinutes * 60000L;
+            if (trigger > System.currentTimeMillis()) {
+                ReminderScheduler.schedule(this, e.id, trigger);
+            } else {
+                ReminderScheduler.cancel(this, e.id);
+            }
+        } else {
+            ReminderScheduler.cancel(this, e.id);
+        }
     }
 
     private int parseInt(String s) {

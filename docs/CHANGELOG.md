@@ -103,3 +103,23 @@
 - **② AI 提示词与修改**：见 `prompts.md`「网络访问」。
 - **③ 问题与解决**：模型偶尔输出代码块/说明文字 → 截取首个 JSON 对象再解析；字段类型不稳 → optStr/optInt/optBool 容错。
 - **验证**：`assembleDebug` 成功（39s）；启动无崩溃。真实 AI 解析需在设置页填入 DeepSeek API Key 后由你在 AS 中验证。阶段 4 结束，进入阶段 5（通知）。
+
+---
+
+## 阶段 5｜通知（Notification）
+
+### `feat(notify): AlarmManager 到点提醒 + NotificationChannel + 点击进详情`
+
+- **① 做了什么**：
+  - `notify/Notifier`：创建通知渠道(IMPORTANCE_HIGH)并弹通知；点击跳详情页（测试通知跳首页）；读日程在后台线程。
+  - `notify/ReminderScheduler`：`AlarmManager.setAndAllowWhileIdle` 在 `startTime-reminderMinutes` 定时；按 eventId 作 requestCode，支持 schedule/cancel。
+  - `notify/AlarmReceiver`：到点接收 → 弹通知。
+  - 确认页保存（reminderMinutes>0 且在未来）设置提醒；详情页更新重设、删除取消。
+  - 菜单"测试通知(5秒)"演示整条链路；MainActivity 请求 POST_NOTIFICATIONS（Android 13+）。
+  - Manifest 注册 `AlarmReceiver`(exported=false) + POST_NOTIFICATIONS 权限。
+- **② AI 提示词与修改**：见 `prompts.md`「通知 Notification」。要点：用 `setAndAllowWhileIdle` 免额外权限；Receiver 读 DB 走后台线程。
+- **③ 问题与解决**：
+  - API26+ 不建 channel 通知不显示 → 创建 NotificationChannel（minSdk24 用 `SDK_INT>=O` 兼容）。
+  - Android 13+ 通知不出 → 运行时请求 POST_NOTIFICATIONS。
+  - 验证时 `am broadcast` 无法触达 `exported=false` 的 Receiver（系统安全限制）→ 临时导出验证成功后还原。
+- **验证（✅ 通过）**：`assembleDebug` 成功；临时导出 Receiver 后 `am broadcast` 触发，`AlarmReceiver→Notifier→通知` 成功发出（dumpsys 见 `schedule_reminder` 通道、importance=4/HIGH），随后还原 `exported=false`。**8 项硬性技术要求全部覆盖**，阶段 5 结束。

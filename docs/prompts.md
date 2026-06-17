@@ -107,6 +107,18 @@
 
 （阶段 5 起补充。）
 
+### 第 5 轮（阶段 5，对应 commit `feat(notify): AlarmManager 到点提醒 + 通知渠道`）
+
+- **提示词原文**：「实现通知：到点用 Notification 提醒，点击进详情；用 AlarmManager 在 `startTime-reminderMinutes` 定时，App 退出后仍可提醒；保存设置提醒、更新重设、删除取消；加"测试通知(5秒)"菜单便于演示；处理 Android13+ 的 POST_NOTIFICATIONS 运行时权限与 API26+ 的 NotificationChannel。」
+- **解决的问题**：满足"加入 Notification 通知功能，结合项目场景"。
+- **AI 生成结果与我的修改**：
+  - NotificationChannel（IMPORTANCE_HIGH）在首次发通知时创建；minSdk 24 故用 `SDK_INT>=O` 兼容。
+  - AlarmManager 用 `setAndAllowWhileIdle`（无需 SCHEDULE_EXACT_ALARM 权限，Doze 也可唤醒）——如实记录：精确闹钟需额外 SCHEDULE_EXACT_ALARM，本作业未启用，属已知取舍。
+  - Receiver 读取日程放在后台线程（Room 不能主线程）；通知 PendingIntent 跳详情页（测试通知跳首页）。
+  - 保存/更新/删除时设置/重设/取消提醒（用 eventId 作 requestCode 区分）。
+  - Android 13+ 在 MainActivity 请求 POST_NOTIFICATIONS。
+  - **验证**：临时导出 Receiver 用 `am broadcast` 触发，`AlarmReceiver→Notifier→通知` 成功发出（dumpsys 可见 `schedule_reminder` 通道、importance HIGH）；随后还原 `exported=false`。
+
 ## 调试错误
 
 （开发过程中遇到编译/运行错误时，在此记录提示词与解决办法。）

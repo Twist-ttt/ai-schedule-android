@@ -80,6 +80,13 @@ public class ScheduleRepository {
         });
     }
 
+    /** 同步插入日程并返回 id（供确认页在后台线程拿到 id 用于设置提醒），须在非主线程调用。 */
+    public long insertEventSync(EventRecord event) {
+        long id = eventDao.insert(event);
+        notifyEventsChanged();
+        return id;
+    }
+
     public void updateEvent(EventRecord event) {
         executors.diskIO().execute(() -> {
             eventDao.update(event);

@@ -11,13 +11,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.qiu.aischedule.R;
 import com.qiu.aischedule.data.local.entity.EventRecord;
 import com.qiu.aischedule.data.repository.ScheduleRepository;
+import com.qiu.aischedule.notify.ReminderScheduler;
+import com.qiu.aischedule.util.AppExecutors;
 import com.qiu.aischedule.util.DateUtils;
 
 /**
  * AI 确认页。
- * 展示原始输入（只读）+ 可编辑字段（标题/日期/时间/地点/提醒）。
- * - 若由「AI 解析」进入，字段已被自动回填（且携带 historyId，保存时标记该历史为已应用）；
- * - 若由「手动填写」进入，字段为空可手动编辑（降级路径）。
+ * - 由「AI 解析」进入：字段被自动回填（携带 historyId，保存时标记历史为已应用）；
+ * - 由「手动填写」进入：字段可手动编辑（降级路径）。
+ * 保存：后台线程写入数据库；若 reminderMinutes>0 且提醒时间在未来，则用 AlarmManager 设置提醒。
  */
 public class AiConfirmActivity extends AppCompatActivity {
 
@@ -94,14 +96,24 @@ public class AiConfirmActivity extends AppCompatActivity {
             event.sourceText = sourceText == null ? "" : sourceText;
             event.status = getString(R.string.status_saved);
 
-            repo.insertEvent(event);
-            if (historyId != -1L) {
-                repo.markHistoryApplied(historyId, true);
-            }
-            Toast.makeText(this, R.string.toast_saved, Toast.LENGTH_SHORT).show();
-
-            startActivity(new Intent(this, ScheduleListActivity.class));
-            finish();
+            // 后台线程：写入 DB + 设置提醒
+            AppExecutors.getInstance().diskIO().execute(() -> {
+                long newId = repo.insertEventSync(event);
+                if (reminder > 0) {
+                    long trigger = start - reminder * 60000L;
+                    if (trigger > System.currentTimeMillis()) {
+                        ReminderScheduler.schedule(getApplicationContext(), newId, trigger);
+                    }
+                }
+                if (historyId != -1L) {
+                    repo.markHistoryApplied(historyId, true);
+                }
+                runOnUiThread(() -> {
+                    Toast.makeText(this, R.string.toast_saved, Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, ScheduleListActivity.class));
+                    finish();
+                });
+            });
         });
     }
 

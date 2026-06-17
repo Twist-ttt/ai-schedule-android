@@ -19,10 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.qiu.aischedule.R;
 import com.qiu.aischedule.data.local.entity.EventRecord;
 import com.qiu.aischedule.data.repository.ScheduleRepository;
+import com.qiu.aischedule.notify.ReminderScheduler;
 import com.qiu.aischedule.provider.ScheduleProvider;
 import com.qiu.aischedule.ui.adapter.EventAdapter;
 import com.qiu.aischedule.util.AppExecutors;
 import com.qiu.aischedule.util.DateUtils;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -148,6 +150,11 @@ public class ScheduleListActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        if (id == R.id.action_test_notify) {
+            ReminderScheduler.schedule(this, -1L, System.currentTimeMillis() + 5000);
+            Toast.makeText(this, R.string.toast_test_scheduled, Toast.LENGTH_SHORT).show();
+            return true;
+        }
         if (id == R.id.action_history) {
             startActivity(new Intent(this, HistoryActivity.class));
             return true;

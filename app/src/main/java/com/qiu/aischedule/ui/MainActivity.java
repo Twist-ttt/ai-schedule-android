@@ -1,6 +1,9 @@
 package com.qiu.aischedule.ui;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,18 +14,24 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.qiu.aischedule.R;
 import com.qiu.aischedule.network.LlmClient;
 import com.qiu.aischedule.network.ParsedSchedule;
+import com.qiu.aischedule.notify.ReminderScheduler;
 
 /**
  * 首页（输入页）。
- * - 「AI 解析」：调用 LLM 把一句话解析为结构化字段，自动回填到确认页（满足网络访问要求）；
- * - 「解析 / 手动填写」：降级路径，无 API Key/断网也能用；
- * - 「我的日程」进入看板页；菜单提供历史与设置。
+ * - 「AI 解析」：调用 LLM 解析并自动回填确认页；
+ * - 「解析 / 手动填写」：降级路径；
+ * - 「我的日程」进入看板页；菜单提供 测试通知 / 历史 / 设置。
+ * 首次进入请求 POST_NOTIFICATIONS（Android 13+ 通知所需运行时权限）。
  */
 public class MainActivity extends AppCompatActivity {
+
+    private static final int REQ_POST_NOTIFICATIONS = 1001;
 
     private EditText etInput;
     private Button btnAiParse;
@@ -38,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         btnAiParse = findViewById(R.id.btnAiParse);
         btnToConfirm = findViewById(R.id.btnToConfirm);
         progressBar = findViewById(R.id.progressBar);
+
+        requestNotificationPermissionIfNeeded();
 
         btnAiParse.setOnClickListener(v -> {
             String text = etInput.getText().toString().trim();
@@ -74,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
             });
         });
 
-        // 降级：直接手动填写
         btnToConfirm.setOnClickListener(v -> {
             String text = etInput.getText().toString().trim();
             Intent intent = new Intent(this, AiConfirmActivity.class);
@@ -84,6 +94,16 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btnToSchedule).setOnClickListener(v ->
                 startActivity(new Intent(this, ScheduleListActivity.class)));
+    }
+
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQ_POST_NOTIFICATIONS);
+            }
+        }
     }
 
     private void setParsing(boolean parsing) {
@@ -101,6 +121,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        if (id == R.id.action_test_notify) {
+            ReminderScheduler.schedule(this, -1L, System.currentTimeMillis() + 5000);
+            Toast.makeText(this, R.string.toast_test_scheduled, Toast.LENGTH_SHORT).show();
+            return true;
+        }
         if (id == R.id.action_history) {
             startActivity(new Intent(this, HistoryActivity.class));
             return true;
