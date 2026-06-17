@@ -41,3 +41,19 @@
 - **② AI 提示词与修改**：见 `prompts.md`「Room 数据库」。要点：实体用 public 字段；`exportSchema=false`；ApiConfig 固定单行；自定义 `Callback<T>` 不依赖 `java.util.function`；写操作全部后台线程。
 - **③ 问题与解决**：主线程访问 Room 会抛 `IllegalStateException` → Repository 所有写操作包进 `executors.diskIO().execute(...)`；同步读方法注明"须在后台线程调用"。
 - **验证（✅ 通过）**：`./gradlew :app:assembleDebug` BUILD SUCCESSFUL（48s），Room 注解处理器成功生成 DAO/Database 实现类，无编译/SQL 错误。阶段 1 结束，可进入阶段 2（界面 + RecyclerView + CRUD）。
+
+---
+
+## 阶段 2｜界面 + RecyclerView + CRUD（2a 核心闭环）
+
+### `feat(ui): 首页→确认页→看板页→详情页 核心 CRUD 闭环`
+
+- **① 做了什么**：
+  - 新增 4 个 Activity：`MainActivity`（首页输入）、`AiConfirmActivity`（确认/手动填写保存）、`ScheduleListActivity`（CalendarView + RecyclerView 看板）、`DetailActivity`（改/删）。
+  - `EventAdapter`（ListAdapter + DiffUtil）+ `item_event.xml`，每项展示 标题/时间/地点/提醒 共 4 字段。
+  - `util/DateUtils`：epoch 毫秒格式化/解析、按日区间。
+  - 配套布局、strings、Manifest 注册；首页"我的日程"跳转、看板页 FAB 新增。
+  - 数据流：确认页 → Repository.insertEvent → 看板页 LiveData 自动刷新；详情页 observeEvent 填充，更新/删除后台执行后看板自动刷新。
+- **② AI 提示词与修改**：见 `prompts.md`「界面设计 / RecyclerView」。要点：换日内存过滤（避免多 observer）；确认页字段全可编辑（降级）；ListAdapter + DiffUtil。
+- **③ 问题与解决**：`Calendar.set` 没有 7 参数重载导致编译失败 → 改为逐字段 set + 单独置 MILLISECOND=0（详见 `prompts.md`「调试错误」）。
+- **验证**：`./gradlew :app:assembleDebug` BUILD SUCCESSFUL（43s）。运行时 adb 冒烟测试因模拟器已关闭未执行；CRUD 流程待你在 Android Studio 中验证。阶段 2a 结束，下一步 2b（解析历史页 + 设置页）。

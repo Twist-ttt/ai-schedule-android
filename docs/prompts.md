@@ -37,9 +37,24 @@
 
 （阶段 2 起，记录首页输入页、确认页、看板页、详情页、历史页、设置页的界面相关提示词。）
 
+### 第 2 轮（阶段 2a，对应 commit `feat(ui): 核心 CRUD 闭环`）
+
+- **提示词原文**：「按方案阶段 2 实现核心 CRUD 闭环：首页输入页(MainActivity) → 确认页(AiConfirmActivity，手动填写保存) → 看板页(ScheduleListActivity：CalendarView+RecyclerView) → 详情页(DetailActivity，改/删)。字段：标题/日期/时间/地点/提醒；日历选日筛选当天日程。」
+- **解决的问题**：满足"≥3 主要页面""数据从输入页保存到本地数据库""库数据显示到 RecyclerView""修改/删除后界面刷新"等要求；并形成**脱离 AI 也能演示**的完整日程管理器。
+- **AI 生成结果与我的修改**：
+  - 换日筛选采用 `observe 全部日程 + 内存按日过滤`（而非每次换日重新 observe），避免多个 LiveData observer 泄漏。
+  - 确认页字段**全部可编辑**（无 AI 也能手动填写）——这是"降级策略"的落地，演示不依赖网络。
+  - 详情页用 `observeEvent(id)` LiveData 填充并保留 `current` 引用，便于更新/删除。
+
 ## RecyclerView
 
 （阶段 2 起，记录日程列表 Adapter、解析历史列表 Adapter 的提示词。）
+
+### 第 2 轮（阶段 2a）
+
+- **提示词原文**：「写 RecyclerView Adapter 展示日程，每项含 标题/时间/地点/提醒（≥3 字段），点击进详情页。」
+- **解决的问题**：满足"RecyclerView 列表项≥3 字段"。
+- **AI 生成结果与我的修改**：用 `ListAdapter<EventRecord, VH> + DiffUtil.ItemCallback`（而非 `notifyDataSetChanged`）；空地点/0 提醒用占位文案（未设置地点/不提醒）；item 用 `CardView`；点击回调用自定义 `OnEventClickListener` 接口。
 
 ## Room 数据库
 
@@ -69,3 +84,9 @@
 ## 调试错误
 
 （开发过程中遇到编译/运行错误时，在此记录提示词与解决办法。）
+
+### 第 2 轮（阶段 2a）：Calendar.set 没有 7 参数重载，编译失败
+
+- **现象/提示词**：`./gradlew assembleDebug` 报错 `对于 set(int,int,int,int,int,int,int), 找不到合适的方法`（ScheduleListActivity 选日处）。
+- **原因**：`java.util.Calendar` 没有 7 参数（含毫秒）的 `set` 重载，最长的只有 6 参数（到秒）。
+- **解决办法**：改为逐字段 `c.set(Calendar.YEAR, year)`… 并把 `Calendar.MILLISECOND` 单独置 0，确保"当天 0 点"毫秒归零（否则按日区间筛选会出错）。修复后 BUILD SUCCESSFUL。

@@ -1,6 +1,47 @@
 <resources>
     <string name="app_name">AI日程转换助手</string>
+
+    <!-- 首页 -->
     <string name="home_welcome">AI 日程转换助手</string>
     <string name="home_subtitle">把一句话，变成可提醒的日程</string>
-    <string name="home_start">开始使用</string>
+    <string name="home_input_hint">输入一句话，例如：明天9点英语演讲练习，地点图书馆</string>
+    <string name="home_to_confirm">解析 / 手动填写</string>
+    <string name="home_to_schedule">我的日程</string>
+
+    <!-- 确认页 -->
+    <string name="confirm_title">确认日程</string>
+    <string name="manual_entry_hint">（手动填写：直接编辑下方字段）</string>
+    <string name="field_source">原始输入</string>
+    <string name="field_title">标题</string>
+    <string name="field_date">日期 (yyyy-MM-dd)</string>
+    <string name="field_time">时间 (HH:mm)</string>
+    <string name="field_location">地点</string>
+    <string name="field_reminder">提前提醒(分钟)</string>
+
+    <!-- 看板页 -->
+    <string name="schedule_title">日程看板</string>
+    <string name="empty_schedule">当天暂无日程</string>
+    <string name="action_add">新增日程</string>
+
+    <!-- 详情页 -->
+    <string name="detail_title">日程详情</string>
+
+    <!-- 操作 -->
+    <string name="action_save">确认保存</string>
+    <string name="action_update">更新</string>
+    <string name="action_delete">删除</string>
+
+    <!-- 列表项 -->
+    <string name="event_no_location">未设置地点</string>
+    <string name="event_no_reminder">不提醒</string>
+    <string name="event_reminder_suffix">分钟前提醒</string>
+
+    <!-- Toast -->
+    <string name="toast_saved">已保存日程</string>
+    <string name="toast_updated">已更新日程</string>
+    <string name="toast_deleted">已删除日程</string>
+    <string name="toast_invalid_time">日期或时间格式不正确</string>
+    <string name="toast_empty_title">请填写标题</string>
+
+    <string name="status_saved">已保存</string>
 </resources>
