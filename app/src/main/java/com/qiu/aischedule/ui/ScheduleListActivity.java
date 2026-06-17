@@ -2,6 +2,8 @@ package com.qiu.aischedule.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CalendarView;
 import android.widget.TextView;
@@ -17,9 +19,8 @@ import com.qiu.aischedule.ui.adapter.EventAdapter;
 import com.qiu.aischedule.util.DateUtils;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * 日历看板页（RecyclerView 页）。
@@ -80,6 +81,26 @@ public class ScheduleListActivity extends AppCompatActivity {
             }
             applyFilter();
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_history) {
+            startActivity(new Intent(this, HistoryActivity.class));
+            return true;
+        }
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void applyFilter() {

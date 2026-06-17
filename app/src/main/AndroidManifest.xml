@@ -32,6 +32,14 @@
         <activity
             android:name=".ui.DetailActivity"
             android:label="@string/detail_title" />
+
+        <activity
+            android:name=".ui.HistoryActivity"
+            android:label="@string/history_title" />
+
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:label="@string/settings_title" />
     </application>
 
 </manifest>

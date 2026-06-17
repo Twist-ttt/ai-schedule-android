@@ -46,6 +46,12 @@
   - 确认页字段**全部可编辑**（无 AI 也能手动填写）——这是"降级策略"的落地，演示不依赖网络。
   - 详情页用 `observeEvent(id)` LiveData 填充并保留 `current` 引用，便于更新/删除。
 
+### 第 2b 轮（阶段 2b，对应 commit `feat(ui): 解析历史页 + 设置页`）
+
+- **提示词原文**：「新增解析历史页(第2个RecyclerView，原句/JSON/可信度) 与设置页(provider/baseUrl/model/Key)，Key 用 EncryptedSharedPreferences 加密保存；首页与看板页加溢出菜单导航到这两个页面。」
+- **解决的问题**：第 2 个 RecyclerView（再次满足列表要求并为 AI 辅助过程留证据）；设置页为阶段 4 DeepSeek 接入做准备。
+- **AI 生成结果与我的修改**：API Key **不进 Room 表**，单独用 `EncryptedSharedPreferences` 加密存储（底层 Keystore），明文不落库、不入日志；设置页 provider/baseUrl/model 默认 DeepSeek，可随时切换；菜单用标准 `onCreateOptionsMenu`。
+
 ## RecyclerView
 
 （阶段 2 起，记录日程列表 Adapter、解析历史列表 Adapter 的提示词。）

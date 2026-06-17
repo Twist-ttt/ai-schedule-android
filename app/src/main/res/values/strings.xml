@@ -8,6 +8,10 @@
     <string name="home_to_confirm">解析 / 手动填写</string>
     <string name="home_to_schedule">我的日程</string>
 
+    <!-- 菜单 -->
+    <string name="menu_history">解析历史</string>
+    <string name="menu_settings">设置</string>
+
     <!-- 确认页 -->
     <string name="confirm_title">确认日程</string>
     <string name="manual_entry_hint">（手动填写：直接编辑下方字段）</string>
@@ -25,6 +29,21 @@
 
     <!-- 详情页 -->
     <string name="detail_title">日程详情</string>
+
+    <!-- 历史页 -->
+    <string name="history_title">解析历史</string>
+    <string name="empty_history">暂无解析记录</string>
+    <string name="history_label_input">原句</string>
+    <string name="history_label_json">AI 返回 JSON</string>
+
+    <!-- 设置页 -->
+    <string name="settings_title">设置</string>
+    <string name="field_provider">提供方 (provider)</string>
+    <string name="field_baseurl">接口地址 (baseUrl)</string>
+    <string name="field_model">模型 (model)</string>
+    <string name="field_apikey">API Key（本地加密保存）</string>
+    <string name="action_save_config">保存配置</string>
+    <string name="toast_config_saved">配置已保存（API Key 已加密存储）</string>
 
     <!-- 操作 -->
     <string name="action_save">确认保存</string>

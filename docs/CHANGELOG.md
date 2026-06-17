@@ -57,3 +57,15 @@
 - **② AI 提示词与修改**：见 `prompts.md`「界面设计 / RecyclerView」。要点：换日内存过滤（避免多 observer）；确认页字段全可编辑（降级）；ListAdapter + DiffUtil。
 - **③ 问题与解决**：`Calendar.set` 没有 7 参数重载导致编译失败 → 改为逐字段 set + 单独置 MILLISECOND=0（详见 `prompts.md`「调试错误」）。
 - **验证**：`./gradlew :app:assembleDebug` BUILD SUCCESSFUL（43s）。运行时 adb 冒烟测试因模拟器已关闭未执行；CRUD 流程待你在 Android Studio 中验证。阶段 2a 结束，下一步 2b（解析历史页 + 设置页）。
+
+### `feat(ui): 解析历史页 + 设置页 + 菜单导航 + API Key 加密存储（阶段2b）`
+
+- **① 做了什么**：
+  - `HistoryActivity` + `HistoryAdapter` + `item_history.xml`：第 2 个 RecyclerView，展示 原句 / AI 返回 JSON / 模型·可信度·时间（≥3 字段），observe `getHistory()` 自动刷新；空态。
+  - `SettingsActivity` + `activity_settings.xml`：配置 provider/baseUrl/model（存 Room `api_config`）+ API Key（`EncryptedSharedPreferences` 加密存储）；默认 DeepSeek。
+  - `security/SecretStore`：EncryptedSharedPreferences（AES256_GCM + Keystore）封装，明文 Key 不入库不入日志。
+  - `res/menu/menu_main.xml`：溢出菜单"解析历史/设置"；接入 `MainActivity` 与 `ScheduleListActivity`。
+  - Manifest 注册两个新 Activity。
+- **② AI 提示词与修改**：见 `prompts.md`「界面设计」2b。要点：Key 不入 Room 表，单独加密存储（设计文档"第三方库"已说明 security-crypto）。
+- **③ 问题与解决**：无（一次编译通过）。历史页目前为空，将在阶段 4 接入 DeepSeek 后产生记录。
+- **验证（✅ 通过）**：`./gradlew :app:assembleDebug` BUILD SUCCESSFUL（31s）。阶段 2（2a+2b）完成，6 页齐全；进入阶段 3（ContentProvider）。
