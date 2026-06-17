@@ -43,7 +43,16 @@
 
 ## Room 数据库
 
-（阶段 1 起补充。）
+### 第 1 轮（阶段 1，对应 commit `feat(room): 三表实体 + DAO + AppDatabase + Repository + 线程池`）
+
+- **提示词原文（按方案执行）**：「按方案阶段 1 实现 Room 数据层：EventRecord / ParseHistory / ApiConfig 三实体（字段与 PPT 一致）、对应 DAO、AppDatabase 单例、ScheduleRepository 统一入口；后台线程写、LiveData 读。」
+- **解决的问题**：满足作业"必须使用 Room（Entity/DAO/Database）"与"CRUD≥3"，并让后续列表页能通过 LiveData 自动刷新。
+- **AI 生成结果与我的修改**：
+  - 实体直接用 **public 字段**（Room 原生支持），省去样板 getter/setter；时间字段统一 **epoch 毫秒**，便于排序与到点提醒计算。
+  - `exportSchema = false`（作业不做数据库迁移，避免多余 schema 目录）；`ApiConfig` 用固定 `id=1` 单行配置。
+  - DAO 读方法返回 `LiveData<List<…>>` / `LiveData<…>`；额外提供 `getByIdSync` 供通知/详情在后台线程预取。
+  - Repository 不依赖 `java.util.function.Consumer`（项目未启用 core library desugaring），改用自定义 `Callback<T>`。
+  - 主线程访问 Room 会崩 → 所有写操作走 `AppExecutors.diskIO()`。
 
 ## ContentProvider
 

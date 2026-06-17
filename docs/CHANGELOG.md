@@ -25,3 +25,19 @@
   - 问题：模板测试文件包名为 `com.example.myapplication`，重命名后会编译/断言失败。解决：删除模板测试桩（作业不要求单元测试），后续如需测试再按新包名添加。
 
 - **验证（✅ 通过）**：命令行 `./gradlew :app:assembleDebug` 成功（2m36s，BUILD SUCCESSFUL，无编译错误）；`adb install -r` + `am start` 在 Pixel 7（emulator-5554）成功安装并启动，首页占位界面正常显示。阶段 0 结束，可进入阶段 1。
+
+---
+
+## 阶段 1｜Room 数据层
+
+### `feat(room): 三表实体 + DAO + AppDatabase + Repository + 线程池`
+
+- **① 做了什么**：
+  - `data/local/entity/`：`EventRecord`（日程）、`ParseHistory`（解析历史）、`ApiConfig`（配置，固定单行 id=1），字段与 PPT 一致；时间统一存 epoch 毫秒。
+  - `data/local/dao/`：`EventDao`/`HistoryDao`/`ApiConfigDao`，增查改删齐全（满足"CRUD≥3"）；读返回 `LiveData` 用于列表自动刷新；`getByIdSync` 供详情/通知后台预取。
+  - `data/local/AppDatabase`：Room 单例，`@Database(version=1, exportSchema=false)`。
+  - `data/repository/ScheduleRepository`：UI 唯一数据入口；读返回 LiveData，写经 `AppExecutors.diskIO()` 切后台。
+  - `util/AppExecutors`：单线程磁盘 IO + 主线程切换。
+- **② AI 提示词与修改**：见 `prompts.md`「Room 数据库」。要点：实体用 public 字段；`exportSchema=false`；ApiConfig 固定单行；自定义 `Callback<T>` 不依赖 `java.util.function`；写操作全部后台线程。
+- **③ 问题与解决**：主线程访问 Room 会抛 `IllegalStateException` → Repository 所有写操作包进 `executors.diskIO().execute(...)`；同步读方法注明"须在后台线程调用"。
+- **验证（✅ 通过）**：`./gradlew :app:assembleDebug` BUILD SUCCESSFUL（48s），Room 注解处理器成功生成 DAO/Database 实现类，无编译/SQL 错误。阶段 1 结束，可进入阶段 2（界面 + RecyclerView + CRUD）。
