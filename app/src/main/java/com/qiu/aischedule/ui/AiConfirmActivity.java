@@ -14,15 +14,23 @@ import com.qiu.aischedule.data.repository.ScheduleRepository;
 import com.qiu.aischedule.util.DateUtils;
 
 /**
- * AI 确认页（阶段 2 为手动填写版）。
+ * AI 确认页。
  * 展示原始输入（只读）+ 可编辑字段（标题/日期/时间/地点/提醒）。
- * 用户确认后写入数据库。阶段 4 起：进入本页前由 LLM 解析并自动回填这些字段。
+ * - 若由「AI 解析」进入，字段已被自动回填（且携带 historyId，保存时标记该历史为已应用）；
+ * - 若由「手动填写」进入，字段为空可手动编辑（降级路径）。
  */
 public class AiConfirmActivity extends AppCompatActivity {
 
     public static final String EXTRA_SOURCE_TEXT = "extra_source_text";
+    public static final String EXTRA_TITLE = "extra_title";
+    public static final String EXTRA_DATE = "extra_date";
+    public static final String EXTRA_TIME = "extra_time";
+    public static final String EXTRA_LOCATION = "extra_location";
+    public static final String EXTRA_REMINDER = "extra_reminder";
+    public static final String EXTRA_HISTORY_ID = "extra_history_id";
 
     private ScheduleRepository repo;
+    private long historyId = -1L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +39,8 @@ public class AiConfirmActivity extends AppCompatActivity {
 
         repo = ScheduleRepository.getInstance(this);
 
-        String sourceText = getIntent().getStringExtra(EXTRA_SOURCE_TEXT);
+        Intent it = getIntent();
+        String sourceText = it.getStringExtra(EXTRA_SOURCE_TEXT);
         TextView tvSource = findViewById(R.id.tvSource);
         tvSource.setText((sourceText == null || sourceText.isEmpty())
                 ? getString(R.string.manual_entry_hint) : sourceText);
@@ -46,6 +55,22 @@ public class AiConfirmActivity extends AppCompatActivity {
         etDate.setText(DateUtils.formatDate(now));
         etTime.setText(DateUtils.formatTime(now));
         etReminder.setText("0");
+
+        // AI 解析结果回填（如有）
+        if (it.hasExtra(EXTRA_TITLE)) etTitle.setText(it.getStringExtra(EXTRA_TITLE));
+        if (it.hasExtra(EXTRA_DATE)) {
+            String d = it.getStringExtra(EXTRA_DATE);
+            if (d != null && !d.isEmpty()) etDate.setText(d);
+        }
+        if (it.hasExtra(EXTRA_TIME)) {
+            String t = it.getStringExtra(EXTRA_TIME);
+            if (t != null && !t.isEmpty()) etTime.setText(t);
+        }
+        if (it.hasExtra(EXTRA_LOCATION)) etLocation.setText(it.getStringExtra(EXTRA_LOCATION));
+        if (it.hasExtra(EXTRA_REMINDER)) {
+            etReminder.setText(String.valueOf(it.getIntExtra(EXTRA_REMINDER, 0)));
+        }
+        historyId = it.getLongExtra(EXTRA_HISTORY_ID, -1L);
 
         findViewById(R.id.btnSave).setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
@@ -70,9 +95,11 @@ public class AiConfirmActivity extends AppCompatActivity {
             event.status = getString(R.string.status_saved);
 
             repo.insertEvent(event);
+            if (historyId != -1L) {
+                repo.markHistoryApplied(historyId, true);
+            }
             Toast.makeText(this, R.string.toast_saved, Toast.LENGTH_SHORT).show();
 
-            // 保存后直接跳到看板页，便于演示
             startActivity(new Intent(this, ScheduleListActivity.class));
             finish();
         });

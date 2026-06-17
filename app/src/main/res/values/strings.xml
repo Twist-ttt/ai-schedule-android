@@ -5,6 +5,7 @@
     <string name="home_welcome">AI 日程转换助手</string>
     <string name="home_subtitle">把一句话，变成可提醒的日程</string>
     <string name="home_input_hint">输入一句话，例如：明天9点英语演讲练习，地点图书馆</string>
+    <string name="home_ai_parse">AI 解析</string>
     <string name="home_to_confirm">解析 / 手动填写</string>
     <string name="home_to_schedule">我的日程</string>
 
@@ -61,6 +62,10 @@
     <string name="toast_deleted">已删除日程</string>
     <string name="toast_invalid_time">日期或时间格式不正确</string>
     <string name="toast_empty_title">请填写标题</string>
+    <string name="toast_no_input">请先输入一句话</string>
+    <string name="toast_no_apikey">请先在「设置」中填写 API Key 与配置</string>
+    <string name="toast_clarify_prefix">需补充：</string>
+    <string name="toast_parse_failed">AI 解析失败，请检查网络与 API Key（可改用手动填写）</string>
 
     <string name="status_saved">已保存</string>
 </resources>

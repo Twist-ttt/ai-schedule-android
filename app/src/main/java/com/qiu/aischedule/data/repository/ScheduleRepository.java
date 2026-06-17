@@ -98,6 +98,11 @@ public class ScheduleRepository {
         executors.diskIO().execute(() -> historyDao.insert(history));
     }
 
+    /** 同步插入解析历史并返回 id（供网络回调在后台线程记录，须在非主线程调用）。 */
+    public long insertHistorySync(ParseHistory history) {
+        return historyDao.insert(history);
+    }
+
     public void markHistoryApplied(long historyId, boolean applied) {
         executors.diskIO().execute(() -> {
             ParseHistory h = historyDao.getByIdSync(historyId);

@@ -85,3 +85,21 @@
 - **② AI 提示词与修改**：见 `prompts.md`「ContentProvider」。
 - **③ 问题与解决**：CP 方法运行在调用方线程，需在非主线程访问 Room → 看板页查询放在 `AppExecutors.diskIO()`。
 - **验证（✅ 通过）**：`assembleDebug` 成功（37s）；运行时 `adb content query / insert / delete` 全部成功（插入→查到→删除→清空），无崩溃。阶段 3 结束，进入阶段 4（DeepSeek 网络）。
+
+---
+
+## 阶段 4｜网络（DeepSeek）
+
+### `feat(network): DeepSeek 异步解析 + 回填确认页 + ParseHistory`
+
+- **① 做了什么**：
+  - `network/LlmClient`（OkHttp 异步 + Gson）：调用 OpenAI 兼容 `/chat/completions`（默认 DeepSeek），解析为 `ParsedSchedule`；不在主线程；超时 30/60s。
+  - `network/ParsedSchedule`：标题/日期/时间/地点/提醒/needClarification/question。
+  - System Prompt 注入今天日期，要求只输出 JSON；解析时截取 `{...}` 容错。
+  - 首页新增「AI 解析」按钮 + ProgressBar：解析后字段自动回填确认页；needClarification 时 toast 追问。
+  - `AiConfirmActivity` 支持 AI 字段回填；保存时标记对应 ParseHistory 为 `isApplied=true`。
+  - 无 API Key / 网络失败 → toast + 降级手动填写。
+  - Manifest 加 `INTERNET` 权限。
+- **② AI 提示词与修改**：见 `prompts.md`「网络访问」。
+- **③ 问题与解决**：模型偶尔输出代码块/说明文字 → 截取首个 JSON 对象再解析；字段类型不稳 → optStr/optInt/optBool 容错。
+- **验证**：`assembleDebug` 成功（39s）；启动无崩溃。真实 AI 解析需在设置页填入 DeepSeek API Key 后由你在 AS 中验证。阶段 4 结束，进入阶段 5（通知）。

@@ -91,6 +91,18 @@
 
 （阶段 4 起补充：DeepSeek 接口、OkHttp 异步、Gson 解析、降级处理。）
 
+### 第 4 轮（阶段 4，对应 commit `feat(network): DeepSeek 异步解析 + 回填 + 历史`）
+
+- **提示词原文**：「实现网络访问：用 OkHttp 异步调用 DeepSeek 的 `/chat/completions`（OpenAI 兼容），用 Gson 解析返回 JSON 为日程字段（标题/日期/时间/地点/提醒/needClarification），回填到确认页；不能在主线程；无 Key 或失败时降级手动填写；每次解析写入 ParseHistory。Prompt 要求模型只输出 JSON，并注入今天日期。设置页配 baseUrl/model/Key（Key 走 EncryptedSharedPreferences）。」
+- **解决的问题**：满足"网络访问：异步请求+解析+显示，不在主线程"，并实现核心 AI 闭环与降级。
+- **AI 生成结果与我的修改**：
+  - OkHttp `enqueue` 异步（天然不在主线程）；超时 30/60s。
+  - 解析先取 `choices[0].message.content`，再截取首个 `{...}` 用 Gson 解析——兼容模型偶尔加代码块/说明文字。
+  - 字段读取用 `optStr/optInt/optBool` 容错（reminderMinutes 可能是数字或字符串）。
+  - 无 Key / 失败 → 主线程 toast 并保留手动填写路径（演示零风险）。
+  - 成功解析即写 ParseHistory（原句/JSON/可信度/时间），保存日程时标记 `isApplied=true`。
+  - 默认 `https://api.deepseek.com` + `/chat/completions`，DeepSeek 两种 base 写法都兼容。
+
 ## 通知 Notification
 
 （阶段 5 起补充。）
