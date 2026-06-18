@@ -16,3 +16,6 @@
 .kotlin
 local.properties
 *.hprof
+
+# Claude Code 本地开发说明，不纳入提交
+CLAUDE.md
