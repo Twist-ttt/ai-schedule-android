@@ -162,6 +162,15 @@
   - **API 查证**：`MaterialTimePicker.addOnPositiveButtonClickListener` 的监听器是 `View.OnClickListener`（`onClick(View v)` 有参），区别于 `MaterialDatePicker` 的 `OnSelectionListener<S>`（`onSelection(S)` 有参）——查 material-components-android 源码确认两个 picker 的 lambda 写法都正确（`selection ->` / `v ->`）。
   - 用户给的 Kotlin/Compose 代码翻译成 Java + Material Components（XML）；不动存储/业务层、零新依赖。
 
+### 第 17 轮（阶段 6 收尾续，对应 commit `feat(ui): 日期选择器改玻璃转轮 + 锁中文 Locale`）
+
+- **提示词原文**：用户反馈两个问题——「①新增界面语言和设置语言没同步，我设置选的是中文，但点击日期里面显示英文；②日期选择器设计有问题，可以快捷选择年、日，但没有一个快捷选择月的地方」。随后确认方案：问题 1 锁中文，问题 2 选 B（spinner 转轮）且「还要保持玻璃风格」。
+- **解决的问题**：① 选择器（依赖系统 Locale）显示英文，与 app 中文界面不一致；② MaterialDatePicker 月份只能箭头翻、无快捷选月。
+- **AI 生成结果与我的修改**：
+  - **问题 1 诊断**：app `strings.xml` 默认值是硬编码中文，所以 app 界面中文与 locale 无关；而 `MaterialTimePicker`/`DatePicker` 是 Material 库组件，月份名/星期/按钮文本跟随 `Locale.getDefault()`。设备 Locale 若为 en（哪怕系统 UI 选中文，很多模拟器 `Locale.getDefault()` 仍是 en-US），picker 就显示英文。修复：`BaseActivity.attachBaseContext` 强制 `Locale.SIMPLIFIED_CHINESE` + `Locale.setDefault` + `createConfigurationContext`，所有 Activity 及其内部 picker 统一中文。
+  - **问题 2 诊断与取舍**：`MaterialDatePicker` 日历视图点年份标题进年份网格（选年）、点日期格选日，但**月份只能左右箭头翻**——库不提供 month picker，改不了。用户要 spinner（快捷选月）+ 玻璃，但两者有张力：系统 `DatePickerDialog` 的转轮样式与 window 背景难玻璃化，且 spinner 模式要靠 theme attribute（`android:datePickerMode`）配置、本机无法编译验证是否生效。故**自定义 `GlassDatePickerDialog`（DialogFragment）**：玻璃容器 + 年/月/日 3 个 `NumberPicker` 转轮并排，均可独立滚；window 背景置透明让 `bg_glass_card` 圆角显现；NumberPicker 文字色遍历子 `EditText` 统一为 `glass_text_primary`（避免反射设分割线的脆弱写法）；年/月变联动重算当月天数。
+  - **关键取舍**：spinner 的"玻璃"靠 window 透明 + 玻璃容器 + 玻璃 token 配色达成，而非转轮本身半透明。DialogFragment 的 listener（lambda）在配置变化重建时会丢——回调判 null 防崩，演示场景可接受（不引入 FragmentResult 的复杂度）。
+
 ## RecyclerView
 
 （阶段 2 起，记录日程列表 Adapter、解析历史列表 Adapter 的提示词。）

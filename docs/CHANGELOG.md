@@ -245,3 +245,17 @@
   - `MaterialDatePicker.selection` 是 **UTC 零点** millis 的时区陷阱：用 UTC `Calendar` 提取年月日再合成本地 millis，避免跨时区日期偏移。
   - `MaterialTimePicker` 的 positive 监听器是 `View.OnClickListener`（`onClick(View v)` 有参），区别于 `MaterialDatePicker` 的 `OnSelectionListener`（`onSelection(S)` 有参 selection）——查 material-components-android 源码确认 `v -> {...}` 写法正确。
 - **验证**：本机无法编译，需你在 Android Studio **Rebuild + 重装**；重点确认：① 确认页/详情页点日期弹日历、点时间弹时钟、选完回填、保存生效；② 历史页时间显示"X 分钟前"且无"原句"字样；③ 不同时区日期不错位。Material 选择器 API 已查源码（material-components-android master）确认无误。
+
+### `feat(ui): 日期选择器改玻璃转轮(快捷选月) + 全局锁中文 Locale`
+
+- **① 做了什么**：
+  - **语言统一（问题 1）**：`BaseActivity.attachBaseContext` 强制 `Locale.SIMPLIFIED_CHINESE`，所有 Activity 及其内部系统组件（日期/时间选择器）统一中文。
+  - **日期选择器改玻璃转轮（问题 2）**：新建 `GlassDatePickerDialog`（DialogFragment）——玻璃容器（`bg_glass_card`）+ 年/月/日 三个 `NumberPicker` 转轮并排，**均可独立滚动**，月份直达（不再只能箭头翻）。window 背景置透明让玻璃圆角显现；NumberPicker 文字色统一 `glass_text_primary`；年/月变化联动重算当月天数（防"2 月 30 日"）。确认页/详情页 `showDatePicker` 改用它，移除 `MaterialDatePicker`。
+  - `DateUtils` 加 `ofDate(year,month0,day)`；`strings` 加 年/月/日 标签、确定/取消；新增 `dialog_date_picker.xml`。
+- **② AI 提示词与修改**：见 `prompts.md` 第 17 轮。要点：spinner 与玻璃有张力（`DatePickerDialog` 的转轮/window 难玻璃化、theme 配置本机无法验证）→ 自定义 `DialogFragment`+`NumberPicker` 完全可控玻璃风格。
+- **③ 问题与解决**：
+  - 问题 1 根因：app `strings.xml` 是硬编码中文（界面中文与 locale 无关），而 `MaterialTimePicker`/`DatePicker` 依赖 `Locale.getDefault()`（设备若 en 则 picker 英文）→ 锁中文 Locale 统一。
+  - 问题 2 根因：`MaterialDatePicker` 无 month picker（库设计限制，月份只能箭头翻）→ 自定义玻璃转轮对话框。
+  - NumberPicker 文字色：遍历子 `EditText` 设色（避免反射设分割线的脆弱写法）；分割线接受默认。
+  - DialogFragment 的 listener（lambda）在配置变化重建时会丢 → 回调判 null 防崩（演示场景可接受）。
+- **验证**：本机无法编译，需 AS **Rebuild + 重装**；重点确认：① 日期/时间选择器全中文；② 日期对话框三个转轮可独立滚、月份直达、玻璃外观（圆角白霜 + 靛蓝确定按钮）；③ 选 2 月天数正确（闰年 29 天）；④ 确定后回填、保存生效。

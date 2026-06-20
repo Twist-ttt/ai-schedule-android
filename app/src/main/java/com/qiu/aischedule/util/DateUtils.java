@@ -102,6 +102,16 @@ public final class DateUtils {
         return c.getTimeInMillis();
     }
 
+    /** 年/月(0-based)/日 → 当天本地零点 millis（日期选择器回填用）。 */
+    public static long ofDate(int year, int month0, int day) {
+        Calendar c = Calendar.getInstance();
+        c.clear();
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.MONTH, month0);
+        c.set(Calendar.DAY_OF_MONTH, day);
+        return c.getTimeInMillis();
+    }
+
     /** 从 millis 取 [hourOfDay, minute]。 */
     public static int[] hourMinuteOf(long millis) {
         Calendar c = Calendar.getInstance();

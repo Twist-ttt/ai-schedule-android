@@ -1,5 +1,7 @@
 package com.qiu.aischedule.ui;
 
+import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 
@@ -11,6 +13,8 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.qiu.aischedule.R;
+
+import java.util.Locale;
 
 /**
  * 所有 Activity 的基类：根治"装饰层 ActionBar 与布局内容重叠"。
@@ -28,6 +32,16 @@ import com.qiu.aischedule.R;
  * 子类无需改动：onCreate 首行 super.onCreate 触发 ①，setContentView 经本类重写触发 ②③。
  */
 public abstract class BaseActivity extends AppCompatActivity {
+
+    /** 强制中文 Locale——本应用为中文作业，统一界面与系统组件（如日期/时间选择器）语言。 */
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        Locale locale = Locale.SIMPLIFIED_CHINESE;
+        Locale.setDefault(locale);
+        Configuration config = new Configuration(newBase.getResources().getConfiguration());
+        config.setLocale(locale);
+        super.attachBaseContext(newBase.createConfigurationContext(config));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

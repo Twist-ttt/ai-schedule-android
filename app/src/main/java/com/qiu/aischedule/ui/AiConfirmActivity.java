@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 
@@ -154,15 +153,10 @@ public class AiConfirmActivity extends BaseActivity {
 
     /** 弹出日期选择器；选中后更新 dateMillis 并刷新显示。 */
     private void showDatePicker() {
-        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText(R.string.picker_date_title)
-                .setSelection(DateUtils.localMidnightToUtc(dateMillis))
-                .build();
-        picker.addOnPositiveButtonClickListener(selection -> {
-            dateMillis = DateUtils.utcMidnightToLocal(selection);
+        GlassDatePickerDialog.newInstance(dateMillis, (year, month0, day) -> {
+            dateMillis = DateUtils.ofDate(year, month0, day);
             refreshDateTimeDisplay();
-        });
-        picker.show(getSupportFragmentManager(), "date_picker");
+        }).show(getSupportFragmentManager(), "date_picker");
     }
 
     /** 弹出时间选择器；选中后更新 hour/minute 并刷新显示（遵循系统 12/24 小时制）。 */
