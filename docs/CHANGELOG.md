@@ -259,3 +259,13 @@
   - NumberPicker 文字色：遍历子 `EditText` 设色（避免反射设分割线的脆弱写法）；分割线接受默认。
   - DialogFragment 的 listener（lambda）在配置变化重建时会丢 → 回调判 null 防崩（演示场景可接受）。
 - **验证**：本机无法编译，需 AS **Rebuild + 重装**；重点确认：① 日期/时间选择器全中文；② 日期对话框三个转轮可独立滚、月份直达、玻璃外观（圆角白霜 + 靛蓝确定按钮）；③ 选 2 月天数正确（闰年 29 天）；④ 确定后回填、保存生效。
+
+### `feat(ui): 时间选择器改玻璃转轮(时/分)，与日期风格统一`
+
+- **① 做了什么**：
+  - 时间选择器从 `MaterialTimePicker` 改为自建 `GlassTimePickerDialog`（DialogFragment）：玻璃容器 + **时/分两个 NumberPicker 转轮**，时显示 00-23、分显示 00-59（`setDisplayedValues` 两位数对齐），均可循环滚动；与 `GlassDatePickerDialog` 风格统一。
+  - 移除 `MaterialTimePicker`/`TimeFormat`/`DateFormat` 依赖；确认页/详情页 `showTimePicker` 改用 `GlassTimePickerDialog`。
+  - `strings` 加 时/分 标签；新增 `dialog_time_picker.xml`。
+- **② AI 提示词与修改**：见 `prompts.md` 第 18 轮。要点：时间选择器与日期统一为玻璃转轮；不再需要系统 12/24 制判断（转轮固定 00-23 显示）。
+- **③ 问题与解决**：原 `MaterialTimePicker` 需 `DateFormat.is24HourFormat` + `TimeFormat` 判断 12/24 制，改转轮后固定 24 小时制（00-23）显示，逻辑简化；`setDisplayedValues` 让时/分两位数对齐。
+- **验证**：本机无法编译，需 AS **Rebuild + 重装**；重点确认：点时间字段弹玻璃转轮（时/分），选完回填、保存生效。

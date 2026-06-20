@@ -2,16 +2,12 @@ package com.qiu.aischedule.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.material.timepicker.MaterialTimePicker;
-import com.google.android.material.timepicker.TimeFormat;
 
 import com.qiu.aischedule.R;
 import com.qiu.aischedule.data.local.entity.EventRecord;
@@ -159,20 +155,13 @@ public class AiConfirmActivity extends BaseActivity {
         }).show(getSupportFragmentManager(), "date_picker");
     }
 
-    /** 弹出时间选择器；选中后更新 hour/minute 并刷新显示（遵循系统 12/24 小时制）。 */
+    /** 弹出时间选择器（时 00-23、分 00-59 转轮）；选中后更新 hour/minute 并刷新显示。 */
     private void showTimePicker() {
-        MaterialTimePicker picker = new MaterialTimePicker.Builder()
-                .setTitleText(R.string.picker_time_title)
-                .setHour(hour)
-                .setMinute(minute)
-                .setTimeFormat(DateFormat.is24HourFormat(this) ? TimeFormat.CLOCK_24H : TimeFormat.CLOCK_12H)
-                .build();
-        picker.addOnPositiveButtonClickListener(v -> {
-            hour = picker.getHour();
-            minute = picker.getMinute();
+        GlassTimePickerDialog.newInstance(hour, minute, (h, m) -> {
+            hour = h;
+            minute = m;
             refreshDateTimeDisplay();
-        });
-        picker.show(getSupportFragmentManager(), "time_picker");
+        }).show(getSupportFragmentManager(), "time_picker");
     }
 
     /** 把结构化日期/时间状态格式化显示到只读字段（系统本地化）。 */

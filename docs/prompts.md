@@ -171,6 +171,12 @@
   - **问题 2 诊断与取舍**：`MaterialDatePicker` 日历视图点年份标题进年份网格（选年）、点日期格选日，但**月份只能左右箭头翻**——库不提供 month picker，改不了。用户要 spinner（快捷选月）+ 玻璃，但两者有张力：系统 `DatePickerDialog` 的转轮样式与 window 背景难玻璃化，且 spinner 模式要靠 theme attribute（`android:datePickerMode`）配置、本机无法编译验证是否生效。故**自定义 `GlassDatePickerDialog`（DialogFragment）**：玻璃容器 + 年/月/日 3 个 `NumberPicker` 转轮并排，均可独立滚；window 背景置透明让 `bg_glass_card` 圆角显现；NumberPicker 文字色遍历子 `EditText` 统一为 `glass_text_primary`（避免反射设分割线的脆弱写法）；年/月变联动重算当月天数。
   - **关键取舍**：spinner 的"玻璃"靠 window 透明 + 玻璃容器 + 玻璃 token 配色达成，而非转轮本身半透明。DialogFragment 的 listener（lambda）在配置变化重建时会丢——回调判 null 防崩，演示场景可接受（不引入 FragmentResult 的复杂度）。
 
+### 第 18 轮（阶段 6 收尾续，对应 commit `feat(ui): 时间选择器改玻璃转轮`）
+
+- **提示词原文**：「时间也要改成和日期相似的滚轮。同时添加上玻璃效果」。
+- **解决的问题**：时间选择器（`MaterialTimePicker` 时钟/键盘面板）与日期选择器（已改玻璃转轮）风格不统一。
+- **AI 生成结果与我的修改**：新建 `GlassTimePickerDialog`（与 `GlassDatePickerDialog` 同构的 DialogFragment）——玻璃容器 + 时/分两个 `NumberPicker` 转轮；`setDisplayedValues` 显示 `00-23` / `00-59` 两位数对齐；均可循环滚动。移除 `MaterialTimePicker` 及 `DateFormat.is24HourFormat` + `TimeFormat` 的 12/24 制判断（转轮固定 24 小时制 00-23 显示，不再需要适配）。两处 `showTimePicker`（确认页/详情页）改用它，并清理 3 个不再使用的 import。
+
 ## RecyclerView
 
 （阶段 2 起，记录日程列表 Adapter、解析历史列表 Adapter 的提示词。）
