@@ -4,9 +4,9 @@
         <!-- 窗口背景：全屏渐变 -->
         <item name="android:windowBackground">@drawable/bg_app_gradient</item>
 
-        <!-- 状态栏透明 + 白色图标，渐变穿透至顶部 -->
+        <!-- 状态栏透明 + 深色图标（白天底色偏淡），渐变穿透至顶部 -->
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <!-- 关闭 Android 15+ 强制 edge-to-edge，避免内容侵入状态栏 -->
         <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>

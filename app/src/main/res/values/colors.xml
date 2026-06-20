@@ -10,23 +10,24 @@
     <color name="white">#FFFFFFFF</color>
 
     <!-- ===== Glassmorphism 设计令牌（白天 / values） ===== -->
+    <!-- 偏淡粉彩雾色系：低饱和、高明度，让白霜玻璃面板自然浮起 -->
 
-    <!-- 全屏渐变背景：紫 → 靛 → 蓝（白字与玻璃面板均高对比） -->
-    <color name="glass_grad_start">#FF6A11CB</color>
-    <color name="glass_grad_center">#FF3F6EF5</color>
-    <color name="glass_grad_end">#FF2575FC</color>
+    <!-- 全屏渐变背景：淡薰衣草 → 淡天蓝 → 淡粉白（偏淡，非高饱和品牌色） -->
+    <color name="glass_grad_start">#FFEEF2FF</color>
+    <color name="glass_grad_center">#FFE0F2FE</color>
+    <color name="glass_grad_end">#FFFDF4FF</color>
 
-    <!-- 玻璃面板：半透明白霜 + 亮白细描边 -->
-    <color name="glass_card_fill">#2EFFFFFF</color>
-    <color name="glass_card_stroke">#66FFFFFF</color>
-    <color name="glass_card_stroke_focused">#FFFFFFFF</color>
+    <!-- 玻璃面板：较厚的白霜（65%）+ 纯白高光描边，浮于淡彩底之上 -->
+    <color name="glass_card_fill">#A6FFFFFF</color>
+    <color name="glass_card_stroke">#FFFFFFFF</color>
+    <color name="glass_card_stroke_focused">#FF4F46E5</color>
 
-    <!-- 文本：深岩色系，落在白霜玻璃上清晰可读 -->
+    <!-- 文本：深岩色系，落在白霜玻璃上高对比可读 -->
     <color name="glass_text_primary">#FF1E293B</color>
     <color name="glass_text_secondary">#FF475569</color>
     <color name="glass_text_hint">#FF64748B</color>
 
-    <!-- 强调色：靛蓝（文字/图标） + 青（提醒，沿用原有 teal 语感） -->
+    <!-- 强调色：靛蓝（标签/聚焦态/图标）+ 青（提醒，沿用原有 teal 语感） -->
     <color name="glass_accent">#FF4F46E5</color>
     <color name="glass_accent_teal">#FF0F8B8D</color>
 
@@ -34,9 +35,9 @@
     <color name="glass_btn_primary">#FF4F46E5</color>
     <color name="glass_btn_primary_variant">#FF4338CA</color>
 
-    <!-- 浮于渐变之上的图标/标题颜色 -->
+    <!-- 浮于渐变之上的图标/标题颜色（保留语义；ActionBar 已改用 glass_text_* 自适应） -->
     <color name="glass_icon_on_gradient">#FFFFFFFF</color>
 
-    <!-- 顶部 ActionBar 半透明深色条（保证白字标题对比，形成可见的栏） -->
-    <color name="glass_appbar_bg">#33000000</color>
+    <!-- 顶部 ActionBar：白霜玻璃条（70%），配深色标题与图标 -->
+    <color name="glass_appbar_bg">#B3FFFFFF</color>
 </resources>

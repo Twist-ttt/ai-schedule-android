@@ -123,3 +123,18 @@
   - Android 13+ 通知不出 → 运行时请求 POST_NOTIFICATIONS。
   - 验证时 `am broadcast` 无法触达 `exported=false` 的 Receiver（系统安全限制）→ 临时导出验证成功后还原。
 - **验证（✅ 通过）**：`assembleDebug` 成功；临时导出 Receiver 后 `am broadcast` 触发，`AlarmReceiver→Notifier→通知` 成功发出（dumpsys 见 `schedule_reminder` 通道、importance=4/HIGH），随后还原 `exported=false`。**8 项硬性技术要求全部覆盖**，阶段 5 结束。
+
+---
+
+## 阶段 6（收尾）｜UI/UX 优化
+
+### `fix(ui): 玻璃拟态配色偏淡化 + 霜层加厚 + ActionBar 改白霜自适应`
+
+- **① 做了什么**（纯资源层，零 Java、零 drawable 改动）：
+  - **渐变底偏淡化**：白天由高饱和品牌紫蓝（`#6A11CB→#3F6EF5→#2575FC`）改为低饱和高明度粉彩雾色（`#EEF2FF` 淡薰衣草 → `#E0F2FE` 淡天蓝 → `#FDF4FF` 淡粉白），呼应"色系偏淡"诉求；夜间深邃靛蓝渐变保留。
+  - **玻璃霜加厚**：白天面板霜 18%→65%（`#2EFFFFFF→#A6FFFFFF`），描边 40%→纯白高光（`#66FFFFFF→#FFFFFFFF`），让面板真正"浮"于淡彩底之上，解决原先"霜太薄、看起来像廉价浅蓝色块"的问题；夜间同步霜 24%→50%、描边 30%→60%。
+  - **聚焦态着色**：输入框聚焦描边由"更亮的白"改为靛蓝（白天 `#4F46E5` / 夜间 `#A5B4FC`），聚焦反馈更明确。
+  - **ActionBar 改白霜自适应**：白天由半透明黑条（`#33000000` + 白字）改为白霜条（`#B3FFFFFF`）+ 深色标题/图标，并 `windowLightStatusBar=true`（状态栏图标深色）；夜间保持深色条 + 白字（`windowLightStatusBar=false`，由 `values-night/themes.xml` 覆盖）。标题与图标色改用 `glass_text_primary` token，昼夜自动切换。
+- **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 6 轮。要点：背景是纯渐变而非图片，故不需要真 backdrop blur——把底做淡、霜做厚，glassmorphism 观感即达成，仍保持纯资源层、不增依赖。
+- **③ 问题与解决**：ActionBar 由"黑底白字"翻转为"白霜底深字"时，标题、返回/溢出图标、状态栏图标三处颜色须联动（否则白字落在白霜上看不见）——通过 `glass_text_primary` token + `windowLightStatusBar` 昼夜分离一次性解决。
+- **验证**：本机无 java/gradle，构建由你在 Android Studio 中 Sync + Run 确认；改动仅涉及 `values/colors.xml`、`values-night/colors.xml`、`values/themes.xml`、`values-night/themes.xml`、`values/styles.xml` 五个资源文件，无 Java/XML 结构变更，风险面小。

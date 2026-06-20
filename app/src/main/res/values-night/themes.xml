@@ -1,3 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- 夜间使用 values/themes.xml 的同一主题：玻璃令牌的夜间差异由 colors-night 提供。 -->
+    <!-- 夜间覆盖：底色深邃，状态栏图标改回白色；其余沿用 values/themes.xml 的同一主题，
+         玻璃令牌的昼夜差异由 colors-night 提供。 -->
+    <style name="Theme.MyApplication" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 </resources>

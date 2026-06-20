@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- ===== Glassmorphism 设计令牌（夜间 / values-night） ===== -->
+    <!-- 深邃靛蓝渐变保留；霜与描边同步提厚，衬托近白文字 -->
 
     <!-- 深邃靛蓝渐变，衬托白色玻璃面板 -->
     <color name="glass_grad_start">#FF1B1538</color>
     <color name="glass_grad_center">#FF2A2466</color>
     <color name="glass_grad_end">#FF3D2A8E</color>
 
-    <!-- 玻璃面板：半透明深霜 + 微白描边（白字落其上清晰） -->
-    <color name="glass_card_fill">#3D222A52</color>
-    <color name="glass_card_stroke">#4DFFFFFF</color>
-    <color name="glass_card_stroke_focused">#B3FFFFFF</color>
+    <!-- 玻璃面板：深霜（50%）+ 微白描边（60%），白字落其上清晰 -->
+    <color name="glass_card_fill">#80222A52</color>
+    <color name="glass_card_stroke">#99FFFFFF</color>
+    <color name="glass_card_stroke_focused">#FFA5B4FC</color>
 
     <!-- 文本：近白色系 -->
     <color name="glass_text_primary">#FFF1F5F9</color>
@@ -21,12 +22,12 @@
     <color name="glass_accent">#FFA5B4FC</color>
     <color name="glass_accent_teal">#FF2DD4BF</color>
 
-    <!-- 按钮填充：略深的靛蓝，白字可读 -->
+    <!-- 按钮填充：略亮的靛蓝，白字可读 -->
     <color name="glass_btn_primary">#FF6366F1</color>
     <color name="glass_btn_primary_variant">#FF818CF8</color>
 
     <color name="glass_icon_on_gradient">#FFFFFFFF</color>
 
-    <!-- 顶部 ActionBar 半透明深色条 -->
-    <color name="glass_appbar_bg">#4D000000</color>
+    <!-- 顶部 ActionBar：半透明深色条（60%），配白字与白图标 -->
+    <color name="glass_appbar_bg">#99000000</color>
 </resources>

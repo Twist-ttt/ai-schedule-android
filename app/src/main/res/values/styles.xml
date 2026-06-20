@@ -19,7 +19,7 @@
     </style>
 
     <style name="TextAppearance.MyApp.ActionBar.Title" parent="TextAppearance.MaterialComponents.Headline6">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/glass_text_primary</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
@@ -69,7 +69,7 @@
         <item name="elevation">0dp</item>
     </style>
 
-    <!-- ===== ActionBar（透明玻璃条 + 白色标题与图标） ===== -->
+    <!-- ===== ActionBar：白霜/深色玻璃条（随昼夜）+ 自适应标题与图标 ===== -->
 
     <style name="Widget.MyApp.ActionBar" parent="Widget.MaterialComponents.Light.ActionBar.Solid">
         <item name="background">@color/glass_appbar_bg</item>
@@ -78,9 +78,9 @@
         <item name="titleTextStyle">@style/TextAppearance.MyApp.ActionBar.Title</item>
     </style>
 
-    <!-- ActionBar 主题叠加：溢出/返回图标与标题统一为白色 -->
+    <!-- ActionBar 主题叠加：标题与图标颜色随昼夜自适应（白天深色 / 夜间白色） -->
     <style name="ThemeOverlay.MyApp.ActionBar" parent="ThemeOverlay.MaterialComponents.ActionBar">
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="colorControlNormal">@color/glass_icon_on_gradient</item>
+        <item name="android:textColorPrimary">@color/glass_text_primary</item>
+        <item name="colorControlNormal">@color/glass_text_primary</item>
     </style>
 </resources>

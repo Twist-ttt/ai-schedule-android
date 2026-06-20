@@ -52,6 +52,16 @@
 - **解决的问题**：第 2 个 RecyclerView（再次满足列表要求并为 AI 辅助过程留证据）；设置页为阶段 4 DeepSeek 接入做准备。
 - **AI 生成结果与我的修改**：API Key **不进 Room 表**，单独用 `EncryptedSharedPreferences` 加密存储（底层 Keystore），明文不落库、不入日志；设置页 provider/baseUrl/model 默认 DeepSeek，可随时切换；菜单用标准 `onCreateOptionsMenu`。
 
+### 第 6 轮（阶段 6 收尾，对应 commit `fix(ui): 玻璃拟态配色偏淡化`）
+
+- **提示词原文**：「从手机 UI/UX 设计的角度评估项目目前的问题，尤其是 [设置页截图] 出现的问题；要符合 Glassmorphism 风格，色系要偏淡。然后执行修改。」
+- **解决的问题**：截图里设置页的玻璃面板在鲜艳紫蓝渐变上糊成"廉价浅蓝色块"，没有玻璃质感，且整体配色偏重、不符合"偏淡"诉求。
+- **AI 生成结果与我的修改**：
+  - 先做根因诊断：当前"玻璃"只是半透明白色 shape，**Android XML drawable 做不了 backdrop blur**，所以是"伪玻璃"；18% 的白霜盖在鲜艳渐变上必然发灰发蓝。
+  - 关键取舍：背景是**纯渐变而非图片**，故不引入 `BlurView` 库、不写 `RenderEffect`——把底色做淡（粉彩雾色）、把霜做厚（65%），glassmorphism 观感自然达成，仍保持纯资源层、零 Java、不增依赖。
+  - 让 AI 只改 5 个资源 token 文件（colors day/night、themes day/night、styles），所有 drawable 与布局零改动（已确认布局无硬编码颜色），全局自动生效。
+  - 同步处理 ActionBar 翻转的连锁项（标题色、图标色、状态栏图标昼夜分离），避免"白字落在白霜上看不见"。
+
 ## RecyclerView
 
 （阶段 2 起，记录日程列表 Adapter、解析历史列表 Adapter 的提示词。）
