@@ -44,8 +44,8 @@
     <color name="glass_btn_primary">#FF6366F1</color>
     <color name="glass_btn_primary_variant">#FF818CF8</color>
 
-    <!-- 玻璃二级按钮：深底上的霜（30%）+ 50% 白描边 -->
-    <color name="glass_btn_glass_fill">#4DFFFFFF</color>
+    <!-- 玻璃二级按钮：深底上的霜（20%）+ 50% 白描边，明显低于输入框 -->
+    <color name="glass_btn_glass_fill">#33FFFFFF</color>
     <color name="glass_btn_glass_stroke">#80FFFFFF</color>
 
     <color name="glass_icon_on_gradient">#FFFFFFFF</color>

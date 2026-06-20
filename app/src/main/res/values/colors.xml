@@ -34,11 +34,11 @@
     <color name="glass_card_stroke">#FFFFFFFF</color>
     <color name="glass_card_stroke_focused">#B36C63FF</color>
 
-    <!-- 玻璃输入区：比面板更透（40%），落在面板内呈"内陷"层次；描边 55% 白 -->
-    <color name="glass_input_fill">#66FFFFFF</color>
+    <!-- 玻璃输入区：比面板略透（45%），落在面板内呈"内陷"层次；描边 55% 白 -->
+    <color name="glass_input_fill">#73FFFFFF</color>
     <color name="glass_input_stroke">#8CFFFFFF</color>
     <!-- 玻璃顶部光泽渐变起点：模拟毛玻璃顶光，增强立体感 -->
-    <color name="glass_highlight_top">#66FFFFFF</color>
+    <color name="glass_highlight_top">#8CFFFFFF</color>
 
     <!-- 文本：深岩色系，落在白霜玻璃上高对比可读 -->
     <color name="glass_text_primary">#FF1E293B</color>
@@ -53,8 +53,8 @@
     <color name="glass_btn_primary">#FF4F46E5</color>
     <color name="glass_btn_primary_variant">#FF4338CA</color>
 
-    <!-- 玻璃二级按钮：比面板更透（38%）的霜 + 65% 白描边，与卡片拉开层次 -->
-    <color name="glass_btn_glass_fill">#61FFFFFF</color>
+    <!-- 玻璃二级按钮：更轻（28%）的霜 + 65% 白描边，明显低于输入框，与卡片拉开层次 -->
+    <color name="glass_btn_glass_fill">#47FFFFFF</color>
     <color name="glass_btn_glass_stroke">#A6FFFFFF</color>
 
     <!-- 浮于渐变之上的图标/标题颜色（保留语义；ActionBar 已改用 glass_text_* 自适应） -->

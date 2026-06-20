@@ -6,7 +6,7 @@
     <!-- 通用玻璃面板：霜化背景 + 细描边 + 柔和投影（圆角由 drawable 提供） -->
     <style name="Widget.MyApp.GlassContainer" parent="@android:style/Widget">
         <item name="android:background">@drawable/bg_glass_card</item>
-        <item name="android:elevation">8dp</item>
+        <item name="android:elevation">12dp</item>
         <!-- API28+ 柔和靛蓝投影，近似 glassmorphism 彩色软阴影（pre-28 自动忽略） -->
         <item name="android:outlineSpotShadowColor">@color/glass_shadow_spot</item>
         <item name="android:outlineAmbientShadowColor">@color/glass_shadow_ambient</item>

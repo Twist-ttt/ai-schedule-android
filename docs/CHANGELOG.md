@@ -178,3 +178,13 @@
 - **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 10 轮。用户明确指出这是"布局没吃到 Scaffold innerPadding / 没加 statusBarsPadding"的 inset 问题，非配色问题；翻译到本项目 Java+View 技术栈即 setDecorFitsSystemWindows。
 - **③ 问题与解决**：用户提示词里用 Compose（Scaffold / statusBarsPadding）描述——本项目是 AppCompatActivity+XML，不能直接用；以运行时 setDecorFitsSystemWindows 等价实现"内容避开系统栏"。
 - **验证**：本机无法编译，需你在 Android Studio Sync + Run；重点确认 ① 设置页 provider 在"设置"标题下方、不进状态栏；② 看板页 "June 2026" 月份栏在日历卡片内、远离摄像头打孔。若个别 API35+ 设备仍重叠，则需进一步改 NoActionBar+Toolbar+WindowInsetsListener（本轮先用最小风险的运行时调用）。
+
+### `fix(ui): 玻璃卡片投影/高光加强 + 输入框与二级按钮层级拉开 + 看板日历卡留白`
+
+- **① 做了什么**（纯资源层，零 Java）：
+  - **卡片质感更明确**：`GlassContainer` elevation 8dp→12dp，靛蓝软阴影更明显；顶部高光 `glass_highlight_top` 40%→55%，玻璃顶光更亮（响应"高光边框和阴影再明确一点"）。
+  - **输入框 vs 二级按钮层级拉开**：输入框霜 40%→45%（更实，作主输入更突出）；二级玻璃按钮霜 38%→28%（更轻）；形成 卡片 55% > 输入 45% > 按钮 28% 三级层次，解决"输入框与二级按钮都是浅色玻璃块、层级太接近"。夜间按钮同步 30%→20%。
+  - **看板页日历卡留白**：顶部 marginTop 12→16dp，安全区修复后给月份切换更多呼吸距离。
+- **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 11 轮。落地用户反馈的第 4、5 点（玻璃质感加强、输入/按钮层级区分）。
+- **③ 问题与解决**：二级按钮高度差异化（用户建议 44–48dp）未做——MaterialButton 的 inset 与 minHeight 联动复杂、本机无法编译验证，避免把按钮改得过矮；层级改用透明度区分，更稳妥。
+- **验证**：本机无法编译，需你在 Android Studio Sync + Run；重点确认卡片有更明显柔和投影与顶部高光、首页二级按钮明显比输入框更通透。
