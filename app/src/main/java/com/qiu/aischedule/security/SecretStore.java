@@ -20,16 +20,23 @@ public final class SecretStore {
     private static final String FILE_NAME = "ai_schedule_secrets";
     private static final String KEY_API_KEY = "api_key";
 
+    // TEMP(测试用)：DeepSeek 测试 Key。**用完务必删除本常量，并到 DeepSeek 账号注销该 Key。**
+    private static final String TEST_API_KEY = "sk-c1cc12e8139e41e48a8be51a8ae4c031";
+
     private SecretStore() {
     }
 
     public static String getApiKey(Context context) {
         try {
-            return prefs(context).getString(KEY_API_KEY, "");
+            String stored = prefs(context).getString(KEY_API_KEY, "");
+            if (stored != null && !stored.isEmpty()) {
+                return stored;
+            }
         } catch (GeneralSecurityException | IOException e) {
             Log.e(TAG, "读取 API Key 失败", e);
-            return "";
         }
+        // TEMP(测试用)：设置页未填写时，回退到内置测试 Key
+        return TEST_API_KEY;
     }
 
     public static void setApiKey(Context context, String apiKey) {
