@@ -148,3 +148,11 @@
 - **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 7 轮。调用了 ui-ux-pro-max skill，依据其 `safe-area-awareness`、`system-bar-clearance`、`effects-match-style` 规则。
 - **③ 问题与解决**：视觉分析/OCR 工具均报告"状态栏与标题未重叠"，但实机用户明确看到重叠——以实机为准；定位为"透明状态栏 + edge-to-edge opt-out 在 targetSdk 36 下不稳定"的已知脆弱组合，以"状态栏实色化"根治。
 - **验证**：本机无法编译，需你在 Android Studio Sync + Run；重点确认设置页/首页/看板顶部状态栏与标题不再重叠，卡片有明显玻璃光泽。
+
+### `fix(ui): 表单页顶部安全区间距（设置/详情/确认页）`
+
+- **① 做了什么**（纯资源层，零 Java）：
+  - 设置页、详情页、AI 确认页三个 ScrollView 表单页，把首个内容元素（玻璃面板 / 首个字段 label）的 `layout_marginTop` 由 `12dp` 统一加到 `20dp`，让表单与顶部 ActionBar 标题之间留出明确呼吸距离（根容器 20dp padding + 卡片 20dp marginTop = ActionBar 下方约 40dp），根治"provider 这一行像是被顶栏压住、内容太靠上"的观感。三页结构一致，统一间距避免页面间不一致。
+- **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 8 轮。用户给出完整 glassmorphism 重设计规格，本轮先落地其中优先级最高的"设置页顶部安全区间距"。
+- **③ 问题与解决**：主题为 `DarkActionBar`，框架本就把内容放在 ActionBar 下方；但 ActionBar 为 70% 白霜半透明条，与渐变底色相近，视觉上标题与首张卡片界限模糊，显得"贴在一起"。解决方式是单纯加大顶部留白（不改 ActionBar、不加 fitsSystemWindows，避免不可编译验证的 inset 行为）。
+- **验证**：本机无法编译，需你在 Android Studio Sync + Run；重点确认设置页 provider 字段不再贴近标题栏。

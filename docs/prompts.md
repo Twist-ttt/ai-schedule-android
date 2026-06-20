@@ -72,6 +72,14 @@
   - **玻璃质感**：纯 XML 无 backdrop blur，改用 `layer-list` 在 `bg_glass_card.xml` 叠"霜 + 顶部高光渐变 + 描边"近似毛玻璃（新增 `glass_highlight_top` token，昼夜强弱不同）；霜透明度 65%→60% 让淡彩渐变更透出。
   - 保持纯资源层、零 Java、不增依赖；item 列表项本就走 `GlassContainer`，全局自动生效。
 
+### 第 8 轮（阶段 6 收尾续，对应 commit `fix(ui): 表单页顶部安全区间距`）
+
+- **提示词原文**：用户给出一份完整的"浅色 glassmorphism 重设计"诊断与规格（背景太平/卡片不够像玻璃/层级不清/设置页顶部被挤压），并列出三件优先级最高的事：① 修复设置页顶部 Safe Area / AppBar padding；② 给背景加渐变光斑，否则玻璃感出不来；③ 把卡片、输入框、二级按钮统一成真正的玻璃组件。
+- **解决的问题**：设置页（及同结构的详情页、确认页）首个字段 label 离顶部 ActionBar 标题太近，像被顶栏压住。
+- **AI 生成结果与我的修改**：
+  - 定位：主题 `DarkActionBar` 已保证内容在 ActionBar 下方，并非真重叠；问题是 70% 白霜半透明 ActionBar 与渐变底色相近，标题与首张卡片视觉界限模糊。故只做"加大顶部留白"，不动 ActionBar、不加 `fitsSystemWindows`（后者会引入无法本地编译验证的 inset 双计行为）。
+  - 修改：三个表单页首个内容元素 `layout_marginTop` 12dp → 20dp，统一间距。本轮只落地优先级 ①，光斑与玻璃质感留到下一轮。
+
 ## RecyclerView
 
 （阶段 2 起，记录日程列表 Adapter、解析历史列表 Adapter 的提示词。）
