@@ -6,7 +6,10 @@
     <!-- 通用玻璃面板：霜化背景 + 细描边 + 柔和投影（圆角由 drawable 提供） -->
     <style name="Widget.MyApp.GlassContainer" parent="@android:style/Widget">
         <item name="android:background">@drawable/bg_glass_card</item>
-        <item name="android:elevation">3dp</item>
+        <item name="android:elevation">8dp</item>
+        <!-- API28+ 柔和靛蓝投影，近似 glassmorphism 彩色软阴影（pre-28 自动忽略） -->
+        <item name="android:outlineSpotShadowColor">@color/glass_shadow_spot</item>
+        <item name="android:outlineAmbientShadowColor">@color/glass_shadow_ambient</item>
     </style>
 
     <!-- ===== 文本外观 ===== -->
@@ -47,20 +50,20 @@
         <item name="android:textSize">15sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0.02</item>
-        <item name="cornerRadius">24dp</item>
+        <item name="cornerRadius">26dp</item>
         <item name="android:minHeight">52dp</item>
         <item name="android:insetTop">6dp</item>
         <item name="android:insetBottom">6dp</item>
-        <item name="elevation">2dp</item>
+        <item name="elevation">4dp</item>
     </style>
 
     <!-- 次按钮（透明玻璃描边） -->
     <style name="Widget.MyApp.Button.Glass" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:textColor">@color/glass_text_primary</item>
         <item name="backgroundTint">@color/glass_btn_glass_csl</item>
-        <item name="strokeColor">@color/glass_card_stroke</item>
+        <item name="strokeColor">@color/glass_btn_glass_stroke</item>
         <item name="strokeWidth">1dp</item>
-        <item name="cornerRadius">24dp</item>
+        <item name="cornerRadius">26dp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textSize">15sp</item>
         <item name="android:minHeight">52dp</item>

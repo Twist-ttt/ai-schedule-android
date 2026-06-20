@@ -156,3 +156,15 @@
 - **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 8 轮。用户给出完整 glassmorphism 重设计规格，本轮先落地其中优先级最高的"设置页顶部安全区间距"。
 - **③ 问题与解决**：主题为 `DarkActionBar`，框架本就把内容放在 ActionBar 下方；但 ActionBar 为 70% 白霜半透明条，与渐变底色相近，视觉上标题与首张卡片界限模糊，显得"贴在一起"。解决方式是单纯加大顶部留白（不改 ActionBar、不加 fitsSystemWindows，避免不可编译验证的 inset 行为）。
 - **验证**：本机无法编译，需你在 Android Studio Sync + Run；重点确认设置页 provider 字段不再贴近标题栏。
+
+### `feat(ui): 背景柔光斑 + 玻璃面板/输入框/按钮层级质感`
+
+- **① 做了什么**（纯资源层，零 Java）：
+  - **背景柔光斑**（玻璃感的关键前提）：`bg_app_gradient.xml` 由单一线性渐变改为 `layer-list`——粉彩线性渐变 + 3 处柔和 radial 光斑（左上淡薰衣草 / 右中淡天蓝 / 左下淡薄荷，昼夜各一套 `glass_blob_*` token）。半透明玻璃面板"被磨砂"的彩色底终于存在，玻璃质感得以显现。
+  - **玻璃面板**：圆角 24dp→30dp；`GlassContainer` elevation 3dp→8dp，并设 `outlineSpotShadowColor`/`outlineAmbientShadowColor`（API28+，靛蓝软阴影 token `glass_shadow_*`，近似 glassmorphism 彩色投影，pre-28 忽略）；霜透明度 60%→55% 让光斑更透出。
+  - **玻璃输入区**：圆角 16dp→20dp；新增独立 `glass_input_fill`(40%)/`glass_input_stroke`(55%) token，比面板更透，落在面板内呈"内陷"层次；聚焦描边改 `#6C63FF`@70%（`glass_card_stroke_focused`）。
+  - **按钮**：主按钮圆角 24→26、elevation 2→4（保留实色靛蓝，不冒险换渐变背景以保编译稳妥）；二级玻璃按钮圆角 24→26、改用独立 `glass_btn_glass_fill`(38%)/`glass_btn_glass_stroke`(65% 白)，与卡片拉开"卡片>按钮>输入"三级透明度层次。
+  - 所有列表项（看板/历史）走 `GlassContainer`，全局自动生效；昼夜 token 配齐。
+- **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 9 轮。依据用户给出的完整 glassmorphism 规格逐条落地优先级 ②（背景光斑）与 ③（卡片/输入/按钮统一玻璃组件）。
+- **③ 问题与解决**：纯 XML 无 backdrop blur——继续沿用"霜+顶光+描边+柔和投影"近似，不引入 BlurView/RenderEffect；用 radial gradient 近似模糊光斑，`gradientRadius` 用 dp 维度以适配不同密度。主按钮渐变需自定义 background drawable 且会破坏 Material 涟漪/圆角，本机无法编译验证，故保留实色仅精修圆角与投影。
+- **验证**：本机无法编译，需你在 Android Studio Sync + Run；重点确认：首页/设置页背景能看到三处彩色光晕、玻璃面板有柔和靛蓝投影与明显圆角、输入框聚焦时靛蓝描边、二级按钮比卡片更通透。已自检所有 `@color/` token 在 day/night 双套齐全、无悬空引用。

@@ -11,10 +11,23 @@
     <color name="glass_grad_center">#FF2A2466</color>
     <color name="glass_grad_end">#FF3D2A8E</color>
 
+    <!-- 背景柔光斑：深底上的微亮光晕（靛/蓝/青），给玻璃提供"被磨砂"的彩色底 -->
+    <color name="glass_blob_lavender">#336366F1</color>
+    <color name="glass_blob_sky">#265B8DFF</color>
+    <color name="glass_blob_mint">#1F2DD4BF</color>
+
+    <!-- 卡片柔和投影色（夜间深靛，避免亮边） -->
+    <color name="glass_shadow_spot">#FF1E1B4B</color>
+    <color name="glass_shadow_ambient">#FF312E81</color>
+
     <!-- 玻璃面板：深霜（50%）+ 微白描边（60%）+ 顶部微光，白字落其上清晰 -->
     <color name="glass_card_fill">#80222A52</color>
     <color name="glass_card_stroke">#99FFFFFF</color>
-    <color name="glass_card_stroke_focused">#FFA5B4FC</color>
+    <color name="glass_card_stroke_focused">#B3A5B4FC</color>
+
+    <!-- 玻璃输入区：比面板更透（35%）+ 40% 白描边 -->
+    <color name="glass_input_fill">#59FFFFFF</color>
+    <color name="glass_input_stroke">#66FFFFFF</color>
     <!-- 玻璃顶部光泽渐变起点：夜间弱化 -->
     <color name="glass_highlight_top">#33FFFFFF</color>
 
@@ -30,6 +43,10 @@
     <!-- 按钮填充：略亮的靛蓝，白字可读 -->
     <color name="glass_btn_primary">#FF6366F1</color>
     <color name="glass_btn_primary_variant">#FF818CF8</color>
+
+    <!-- 玻璃二级按钮：深底上的霜（30%）+ 50% 白描边 -->
+    <color name="glass_btn_glass_fill">#4DFFFFFF</color>
+    <color name="glass_btn_glass_stroke">#80FFFFFF</color>
 
     <color name="glass_icon_on_gradient">#FFFFFFFF</color>
 

@@ -20,10 +20,23 @@
     <color name="glass_grad_center">#FFE0F2FE</color>
     <color name="glass_grad_end">#FFFDF4FF</color>
 
-    <!-- 玻璃面板：半透明白霜（60%，透出淡彩底）+ 纯白高光描边 + 顶部光泽层 -->
-    <color name="glass_card_fill">#99FFFFFF</color>
+    <!-- 背景柔光斑：玻璃面板"被磨砂"的彩色底；半透明，由 radial gradient 渲染为模糊光晕 -->
+    <color name="glass_blob_lavender">#40B8A7FF</color>
+    <color name="glass_blob_sky">#338FD8FF</color>
+    <color name="glass_blob_mint">#24A7F3D0</color>
+
+    <!-- 卡片柔和投影色（API28+ outlineSpot/AmbientShadowColor 用；pre-28 忽略） -->
+    <color name="glass_shadow_spot">#FF465AB4</color>
+    <color name="glass_shadow_ambient">#FF6C7BD8</color>
+
+    <!-- 玻璃面板：半透明白霜（55%，透出淡彩底与光斑）+ 纯白高光描边 + 顶部光泽层 -->
+    <color name="glass_card_fill">#8CFFFFFF</color>
     <color name="glass_card_stroke">#FFFFFFFF</color>
-    <color name="glass_card_stroke_focused">#FF4F46E5</color>
+    <color name="glass_card_stroke_focused">#B36C63FF</color>
+
+    <!-- 玻璃输入区：比面板更透（40%），落在面板内呈"内陷"层次；描边 55% 白 -->
+    <color name="glass_input_fill">#66FFFFFF</color>
+    <color name="glass_input_stroke">#8CFFFFFF</color>
     <!-- 玻璃顶部光泽渐变起点：模拟毛玻璃顶光，增强立体感 -->
     <color name="glass_highlight_top">#66FFFFFF</color>
 
@@ -39,6 +52,10 @@
     <!-- 实色按钮填充（colorPrimary）及其变体 -->
     <color name="glass_btn_primary">#FF4F46E5</color>
     <color name="glass_btn_primary_variant">#FF4338CA</color>
+
+    <!-- 玻璃二级按钮：比面板更透（38%）的霜 + 65% 白描边，与卡片拉开层次 -->
+    <color name="glass_btn_glass_fill">#61FFFFFF</color>
+    <color name="glass_btn_glass_stroke">#A6FFFFFF</color>
 
     <!-- 浮于渐变之上的图标/标题颜色（保留语义；ActionBar 已改用 glass_text_* 自适应） -->
     <color name="glass_icon_on_gradient">#FFFFFFFF</color>

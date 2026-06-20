@@ -1,11 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 全屏玻璃拟物渐变背景（窗口背景） -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <gradient
-        android:angle="135"
-        android:centerColor="@color/glass_grad_center"
-        android:endColor="@color/glass_grad_end"
-        android:startColor="@color/glass_grad_start"
-        android:type="linear" />
-</shape>
+<!-- 全屏玻璃拟物背景：粉彩线性渐变 + 3 处柔和光斑（玻璃面板"被磨砂"的彩色底）
+     纯 XML 无 backdrop blur，用 radial gradient 近似模糊光晕；token 昼夜自适应 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 0. 底色：淡薰衣草 → 淡天蓝 → 淡粉白 线性渐变 -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="@color/glass_grad_start"
+                android:centerColor="@color/glass_grad_center"
+                android:endColor="@color/glass_grad_end"
+                android:type="linear" />
+        </shape>
+    </item>
+    <!-- 1. 光斑 A：左上 淡薰衣草 -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="300dp"
+                android:centerX="0.16"
+                android:centerY="0.16"
+                android:startColor="@color/glass_blob_lavender"
+                android:endColor="@android:color/transparent" />
+        </shape>
+    </item>
+    <!-- 2. 光斑 B：右中 淡天蓝 -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="280dp"
+                android:centerX="0.88"
+                android:centerY="0.44"
+                android:startColor="@color/glass_blob_sky"
+                android:endColor="@android:color/transparent" />
+        </shape>
+    </item>
+    <!-- 3. 光斑 C：左下 淡薄荷 -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="260dp"
+                android:centerX="0.22"
+                android:centerY="0.88"
+                android:startColor="@color/glass_blob_mint"
+                android:endColor="@android:color/transparent" />
+        </shape>
+    </item>
+</layer-list>

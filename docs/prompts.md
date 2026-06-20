@@ -80,6 +80,19 @@
   - 定位：主题 `DarkActionBar` 已保证内容在 ActionBar 下方，并非真重叠；问题是 70% 白霜半透明 ActionBar 与渐变底色相近，标题与首张卡片视觉界限模糊。故只做"加大顶部留白"，不动 ActionBar、不加 `fitsSystemWindows`（后者会引入无法本地编译验证的 inset 双计行为）。
   - 修改：三个表单页首个内容元素 `layout_marginTop` 12dp → 20dp，统一间距。本轮只落地优先级 ①，光斑与玻璃质感留到下一轮。
 
+### 第 9 轮（阶段 6 收尾续，对应 commit `feat(ui): 背景柔光斑 + 玻璃面板/输入框/按钮层级质感`）
+
+- **提示词原文**：用户给出完整"浅色 glassmorphism 重设计"规格的三件优先级事项中的 ② 与 ③——给背景加渐变光斑（否则玻璃感出不来），并把卡片、输入框、二级按钮统一成真正的玻璃组件。具体参数：背景蓝紫渐变 + 2–3 处模糊光斑；卡片圆角 28–32dp / 半透明 42–58% / 白边 / 柔和阴影；输入框圆角 22dp / 36% / 聚焦边 #6C63FF@70%；主按钮圆角 26dp / 实色；二级按钮玻璃态 38% / 65% 白边。
+- **解决的问题**：原 UI"背景太平、卡片像普通浅色块、层级不清"。
+- **AI 生成结果与我的修改**：
+  - **根因**：glassmorphism 必须有"被模糊的彩色背景"，原先只是纯线性渐变，半透明卡片后面没有彩色内容可磨砂，必然像浅色块。
+  - **背景**：`bg_app_gradient.xml` 改 layer-list = 线性渐变 + 3 处 radial gradient 光斑（左上薰衣草/右中天蓝/左下薄荷），用 `gradientRadius`(dp) + `centerX/Y` 定位光晕中心；昼夜各一套 `glass_blob_*` token。
+  - **三级透明度层次**：卡片 55% > 二级按钮 38% ≈ 输入 40%（落在卡片内呈内陷），各自独立 token（`glass_card_fill`/`glass_btn_glass_fill`/`glass_input_fill`），避免原来"都 60% 白糊在一起"。
+  - **圆角统一放大**：卡片 24→30、输入 16→20、按钮 24→26；卡片 elevation 3→8 + API28+ 靛蓝软阴影 token（`outlineSpot/AmbientShadowColor`）。
+  - **聚焦态**：输入框聚焦描边改 `#6C63FF`@70%（`glass_card_stroke_focused`），反馈更明确。
+  - **取舍**：主按钮渐变需自定义 background drawable，会破坏 Material 涟漪/圆角、且本机无法编译验证——保留实色靛蓝，仅精修圆角与投影（用户也认可"可保留强主按钮"）。
+  - 保持纯资源层、零 Java、不增依赖；列表项走 `GlassContainer` 全局自动生效。
+
 ## RecyclerView
 
 （阶段 2 起，记录日程列表 Adapter、解析历史列表 Adapter 的提示词。）
