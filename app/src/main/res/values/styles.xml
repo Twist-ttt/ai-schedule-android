@@ -4,7 +4,7 @@
     <!-- ===== 容器 ===== -->
 
     <!-- 通用玻璃面板：霜化背景 + 细描边 + 柔和投影（圆角由 drawable 提供） -->
-    <style name="Widget.MyApp.GlassContainer">
+    <style name="Widget.MyApp.GlassContainer" parent="@android:style/Widget">
         <item name="android:background">@drawable/bg_glass_card</item>
         <item name="android:elevation">3dp</item>
     </style>
