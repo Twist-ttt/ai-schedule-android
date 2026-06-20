@@ -36,4 +36,7 @@
 
     <!-- 浮于渐变之上的图标/标题颜色 -->
     <color name="glass_icon_on_gradient">#FFFFFFFF</color>
+
+    <!-- 顶部 ActionBar 半透明深色条（保证白字标题对比，形成可见的栏） -->
+    <color name="glass_appbar_bg">#33000000</color>
 </resources>

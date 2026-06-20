@@ -72,8 +72,8 @@
     <!-- ===== ActionBar（透明玻璃条 + 白色标题与图标） ===== -->
 
     <style name="Widget.MyApp.ActionBar" parent="Widget.MaterialComponents.Light.ActionBar.Solid">
-        <item name="background">@android:color/transparent</item>
-        <item name="android:background">@android:color/transparent</item>
+        <item name="background">@color/glass_appbar_bg</item>
+        <item name="android:background">@color/glass_appbar_bg</item>
         <item name="elevation">0dp</item>
         <item name="titleTextStyle">@style/TextAppearance.MyApp.ActionBar.Title</item>
     </style>

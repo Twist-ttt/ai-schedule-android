@@ -26,4 +26,7 @@
     <color name="glass_btn_primary_variant">#FF818CF8</color>
 
     <color name="glass_icon_on_gradient">#FFFFFFFF</color>
+
+    <!-- 顶部 ActionBar 半透明深色条 -->
+    <color name="glass_appbar_bg">#4D000000</color>
 </resources>
