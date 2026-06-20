@@ -230,3 +230,18 @@
 - **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 15 轮。要点：不拆成两个 Activity（表单+保存逻辑重复一遍、本质问题没解决）；用模式标记复用同一确认页，根治"两个入口进同一页面但文案/语义混淆"。
 - **③ 问题与解决**：根因**不是**"共用一个页面"——AI 预填 vs 手动空白复用同一表单是标准做法；真正问题是 ① 次按钮文案「解析 / 手动填写」误导（它根本不解析任何东西）② 手动路径下「原始输入」引用块语义错位（没经 AI 却把输入框原句当"原始输入"展示）。两者都不是拆页面能解决的。
 - **验证**：本机无法编译，需你在 Android Studio **Rebuild + 重装**；重点确认三条路径：① 首页点「手动填写」→ 标题"新建日程"、无引用块、字段空白可填；② 首页输一句话点「AI 解析」→ 标题"确认日程"、引用块显示原句、字段被预填；③ 看板页 FAB → 同手动模式。
+
+### `feat(ui): 日期/时间改 Material 选择器 + 历史相对时间（日期时间结构化）`
+
+- **① 做了什么**：
+  - **`DateUtils` 扩展**：① 选择器时区换算 `utcMidnightToLocal`/`localMidnightToUtc`（MaterialDatePicker.selection 是 UTC 零点，须换算）；② `combine(localMidnight,hour,minute)` 合成当天时刻 millis；③ `hourMinuteOf`/`parseDateMillis`/`parseHourMinute` 拆分与解析；④ **本地化显示** `formatDateLocalized`/`formatTimeLocalized`（系统地区 + 12/24 小时自适应，不写死 `yyyy-MM-dd`）；⑤ **相对时间** `relative`（`getRelativeTimeSpanString`，"5 分钟前"/"昨天"）。
+  - **确认页 + 详情页**：日期/时间字段改**只读**（`focusable=false`+`inputType=none`+禁长按），点击弹 `MaterialDatePicker`/`MaterialTimePicker`；内部以结构化状态（`dateMillis`/`hour`/`minute`）持有，**仅显示时格式化**为字符串；保存/更新用 `combine` 合成 epoch millis，**取代 `parseDateTime` 的字符串解析**。
+  - **`MaterialTimePicker` 遵循系统 12/24 小时制**（`DateFormat.is24HourFormat`）。
+  - **历史页**：解析时间由绝对字符串改为相对时间，并修掉 meta 行误用 `history_label_input`（"原句"）标签的 bug。
+  - 字段 label 去掉写死的格式提示（"日期 (yyyy-MM-dd)"→"日期"），新增选择器标题串。
+- **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 16 轮。要点：不引入 java.time/desugaring——核对发现项目**存储/业务层已是 epoch long**（符合"四层"），真正短板只在 UI 输入边界，故用 Material 选择器 + `android.text.format.DateUtils`（系统级、零新依赖、自动本地化）补齐。
+- **③ 问题与解决**：
+  - 用户给的四层架构（java.time/选择器/Compose/desugaring）理论正确，但**对照代码发现项目存储层（`EventRecord.startTime` 等）和业务层都已是 epoch long**，字符串只出现在 UI 边界——故不做大重构，只补 UI 输入边界的选择器化。
+  - `MaterialDatePicker.selection` 是 **UTC 零点** millis 的时区陷阱：用 UTC `Calendar` 提取年月日再合成本地 millis，避免跨时区日期偏移。
+  - `MaterialTimePicker` 的 positive 监听器是 `View.OnClickListener`（`onClick(View v)` 有参），区别于 `MaterialDatePicker` 的 `OnSelectionListener`（`onSelection(S)` 有参 selection）——查 material-components-android 源码确认 `v -> {...}` 写法正确。
+- **验证**：本机无法编译，需你在 Android Studio **Rebuild + 重装**；重点确认：① 确认页/详情页点日期弹日历、点时间弹时钟、选完回填、保存生效；② 历史页时间显示"X 分钟前"且无"原句"字样；③ 不同时区日期不错位。Material 选择器 API 已查源码（material-components-android master）确认无误。

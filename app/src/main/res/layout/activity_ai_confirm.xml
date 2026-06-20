@@ -90,8 +90,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:hint="@string/field_date"
-                    android:inputType="text" />
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:hint="@string/field_datetime_hint"
+                    android:inputType="none"
+                    android:longClickable="false" />
 
                 <TextView
                     style="@style/TextAppearance.MyApp.Label"
@@ -105,8 +108,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:hint="@string/field_time"
-                    android:inputType="text" />
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:hint="@string/field_datetime_hint"
+                    android:inputType="none"
+                    android:longClickable="false" />
 
                 <TextView
                     style="@style/TextAppearance.MyApp.Label"

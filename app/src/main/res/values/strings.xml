@@ -20,8 +20,8 @@
     <string name="manual_entry_hint">（手动填写：直接编辑下方字段）</string>
     <string name="field_source">原始输入</string>
     <string name="field_title">标题</string>
-    <string name="field_date">日期 (yyyy-MM-dd)</string>
-    <string name="field_time">时间 (HH:mm)</string>
+    <string name="field_date">日期</string>
+    <string name="field_time">时间</string>
     <string name="field_location">地点</string>
     <string name="field_reminder">提前提醒(分钟)</string>
 
@@ -50,6 +50,9 @@
 
     <!-- 操作 -->
     <string name="action_save">确认保存</string>
+    <string name="picker_date_title">选择日期</string>
+    <string name="picker_time_title">选择时间</string>
+    <string name="field_datetime_hint">点击选择</string>
     <string name="action_update">更新</string>
     <string name="action_delete">删除</string>
 

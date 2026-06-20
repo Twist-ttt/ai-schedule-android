@@ -151,6 +151,17 @@
   - **关键取舍**：① 手动模式默认值——`EXTRA_MODE` 漏传时退化 `MODE_MANUAL`，保证退化态也是自洽的新建表单，而非"引用块+空内容"。② 手动填写不再读首页输入框内容——手动=从零，避免"敲了字又点手动、原句被当原始输入显示"的歧义（原句只在 AI 模式有意义）。③ 不拆双 Activity，靠模式标记复用，代码不重复。
   - 用户确认方案后落地为 5 文件改动（`strings.xml` 文案+新标题串、`activity_ai_confirm.xml` 包裹 `sourceBlock`、`AiConfirmActivity` 模式逻辑、`MainActivity` 两入口、`ScheduleListActivity` FAB）。
 
+### 第 16 轮（阶段 6 收尾续，对应 commit `feat(ui): 日期/时间改 Material 选择器 + 历史相对时间`）
+
+- **提示词原文**：用户先问「日志中日期、时间不要用字符串形式展示，而是更高级的」；随后贴一份详尽的"日期时间四层架构"设计文（选择→业务数据(LocalDate/Time)→存储→显示，java.time、Material 选择器、Compose、core library desugaring），核心主张"日期时间首先是业务数据类型，其次才是字符串"。
+- **解决的问题**：确认页/详情页的日期/时间仍是让用户**敲字符串**（`yyyy-MM-dd`/`HH:mm`）的 EditText，易输错、不自适应地区与 12/24 制；历史页时间用绝对字符串展示。
+- **AI 生成结果与我的修改**：
+  - **先核对项目现状再定方案**：用户给的"四层架构"理论正确，但查代码发现 **`EventRecord.startTime/endTime`、`ParseHistory.createdAt` 都已是 epoch `long`**，业务层（提醒计算、按日筛选、排序）也用 `long`——字符串真的只出现在 UI 边界（输入 + 显示）。所以**项目已基本符合"四层"，不需要引入 java.time、不需要 desugaring、不用 Compose**（这三者代价：改 build.gradle、本机无法验证、对 CRUD 日程收益有限）。把这一判断讲给用户，避免过度工程。
+  - **真正补的是 UI 输入边界**：确认页/详情页日期/时间改 `MaterialDatePicker`/`MaterialTimePicker`（只读字段 + 点击弹），选择器返回 epoch millis 直接对接现有 `long` 存储层；`DateUtils` 加选择器时区换算 + 本地化显示 + 相对时间。
+  - **关键取舍**：① 显示格式不写死 `SimpleDateFormat("yyyy-MM-dd")`，改 `android.text.format.DateUtils.formatDateTime`（系统地区 + 12/24 自适应）。② `MaterialDatePicker.selection` 是 UTC 零点，严格做 UTC↔本地零点换算（用户文中专门强调的时区陷阱）。③ `MaterialTimePicker` 遵循系统 12/24 制（`DateFormat.is24HourFormat`）。
+  - **API 查证**：`MaterialTimePicker.addOnPositiveButtonClickListener` 的监听器是 `View.OnClickListener`（`onClick(View v)` 有参），区别于 `MaterialDatePicker` 的 `OnSelectionListener<S>`（`onSelection(S)` 有参）——查 material-components-android 源码确认两个 picker 的 lambda 写法都正确（`selection ->` / `v ->`）。
+  - 用户给的 Kotlin/Compose 代码翻译成 Java + Material Components（XML）；不动存储/业务层、零新依赖。
+
 ## RecyclerView
 
 （阶段 2 起，记录日程列表 Adapter、解析历史列表 Adapter 的提示词。）

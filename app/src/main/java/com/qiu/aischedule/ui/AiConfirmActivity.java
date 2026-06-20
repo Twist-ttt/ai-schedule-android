@@ -2,12 +2,17 @@ package com.qiu.aischedule.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 
 import com.qiu.aischedule.R;
 import com.qiu.aischedule.data.local.entity.EventRecord;
@@ -40,6 +45,13 @@ public class AiConfirmActivity extends BaseActivity {
     private ScheduleRepository repo;
     private long historyId = -1L;
 
+    // 日期/时间以结构化状态持有（由选择器写入），仅在显示时格式化为字符串。
+    private EditText etDate;
+    private EditText etTime;
+    private long dateMillis;
+    private int hour;
+    private int minute;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,25 +77,33 @@ public class AiConfirmActivity extends BaseActivity {
         }
 
         EditText etTitle = findViewById(R.id.etTitle);
-        EditText etDate = findViewById(R.id.etDate);
-        EditText etTime = findViewById(R.id.etTime);
+        etDate = findViewById(R.id.etDate);
+        etTime = findViewById(R.id.etTime);
         EditText etLocation = findViewById(R.id.etLocation);
         EditText etReminder = findViewById(R.id.etReminder);
 
-        long now = System.currentTimeMillis();
-        etDate.setText(DateUtils.formatDate(now));
-        etTime.setText(DateUtils.formatTime(now));
-        etReminder.setText("0");
+        // 默认值：当前日期 + 当前时间（结构化）
+        dateMillis = DateUtils.todayStart();
+        int[] hm = DateUtils.hourMinuteOf(System.currentTimeMillis());
+        hour = hm[0];
+        minute = hm[1];
+
+        // 字段只读，点击弹出选择器
+        etDate.setOnClickListener(v -> showDatePicker());
+        etTime.setOnClickListener(v -> showTimePicker());
 
         // AI 解析结果回填（如有）
         if (it.hasExtra(EXTRA_TITLE)) etTitle.setText(it.getStringExtra(EXTRA_TITLE));
         if (it.hasExtra(EXTRA_DATE)) {
-            String d = it.getStringExtra(EXTRA_DATE);
-            if (d != null && !d.isEmpty()) etDate.setText(d);
+            long d = DateUtils.parseDateMillis(it.getStringExtra(EXTRA_DATE));
+            if (d > 0) dateMillis = d;
         }
         if (it.hasExtra(EXTRA_TIME)) {
-            String t = it.getStringExtra(EXTRA_TIME);
-            if (t != null && !t.isEmpty()) etTime.setText(t);
+            int[] t = DateUtils.parseHourMinute(it.getStringExtra(EXTRA_TIME));
+            if (t != null) {
+                hour = t[0];
+                minute = t[1];
+            }
         }
         if (it.hasExtra(EXTRA_LOCATION)) etLocation.setText(it.getStringExtra(EXTRA_LOCATION));
         if (it.hasExtra(EXTRA_REMINDER)) {
@@ -91,17 +111,15 @@ public class AiConfirmActivity extends BaseActivity {
         }
         historyId = it.getLongExtra(EXTRA_HISTORY_ID, -1L);
 
+        refreshDateTimeDisplay();
+
         findViewById(R.id.btnSave).setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
             if (title.isEmpty()) {
                 Toast.makeText(this, R.string.toast_empty_title, Toast.LENGTH_SHORT).show();
                 return;
             }
-            long start = DateUtils.parseDateTime(etDate.getText().toString(), etTime.getText().toString());
-            if (start == 0) {
-                Toast.makeText(this, R.string.toast_invalid_time, Toast.LENGTH_SHORT).show();
-                return;
-            }
+            long start = DateUtils.combine(dateMillis, hour, minute);
             int reminder = parseInt(etReminder.getText().toString().trim());
 
             EventRecord event = new EventRecord();
@@ -132,6 +150,41 @@ public class AiConfirmActivity extends BaseActivity {
                 });
             });
         });
+    }
+
+    /** 弹出日期选择器；选中后更新 dateMillis 并刷新显示。 */
+    private void showDatePicker() {
+        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText(R.string.picker_date_title)
+                .setSelection(DateUtils.localMidnightToUtc(dateMillis))
+                .build();
+        picker.addOnPositiveButtonClickListener(selection -> {
+            dateMillis = DateUtils.utcMidnightToLocal(selection);
+            refreshDateTimeDisplay();
+        });
+        picker.show(getSupportFragmentManager(), "date_picker");
+    }
+
+    /** 弹出时间选择器；选中后更新 hour/minute 并刷新显示（遵循系统 12/24 小时制）。 */
+    private void showTimePicker() {
+        MaterialTimePicker picker = new MaterialTimePicker.Builder()
+                .setTitleText(R.string.picker_time_title)
+                .setHour(hour)
+                .setMinute(minute)
+                .setTimeFormat(DateFormat.is24HourFormat(this) ? TimeFormat.CLOCK_24H : TimeFormat.CLOCK_12H)
+                .build();
+        picker.addOnPositiveButtonClickListener(v -> {
+            hour = picker.getHour();
+            minute = picker.getMinute();
+            refreshDateTimeDisplay();
+        });
+        picker.show(getSupportFragmentManager(), "time_picker");
+    }
+
+    /** 把结构化日期/时间状态格式化显示到只读字段（系统本地化）。 */
+    private void refreshDateTimeDisplay() {
+        etDate.setText(DateUtils.formatDateLocalized(this, dateMillis));
+        etTime.setText(DateUtils.formatTimeLocalized(this, DateUtils.combine(dateMillis, hour, minute)));
     }
 
     private int parseInt(String s) {

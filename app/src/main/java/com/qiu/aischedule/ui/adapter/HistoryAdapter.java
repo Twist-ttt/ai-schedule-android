@@ -1,6 +1,5 @@
 package com.qiu.aischedule.ui.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,14 +52,12 @@ public class HistoryAdapter extends ListAdapter<ParseHistory, HistoryAdapter.VH>
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         ParseHistory h = getItem(position);
-        Context ctx = holder.itemView.getContext();
 
         holder.input.setText(h.inputText == null ? "" : h.inputText);
         holder.json.setText(h.jsonResult == null ? "" : h.jsonResult);
         int pct = Math.round(h.confidence * 100f);
         holder.meta.setText((h.modelName == null ? "" : h.modelName)
-                + "  ·  " + ctx.getString(R.string.history_label_input) + " "
-                + DateUtils.formatDateTime(h.createdAt)
+                + "  ·  " + DateUtils.relative(h.createdAt)
                 + "  ·  " + pct + "%");
     }
 
