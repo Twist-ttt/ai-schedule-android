@@ -1,38 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 首页（输入页）：Hero 玻璃卡片 + 玻璃输入框 + 主/次按钮 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="20dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Hero：品牌与标语 -->
+    <LinearLayout
+        style="@style/Widget.MyApp.GlassContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/home_welcome"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="28dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="@string/home_subtitle"
-        android:textSize="14sp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/home_welcome"
+            android:textColor="@color/glass_text_primary"
+            android:textSize="26sp"
+            android:textStyle="bold" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:text="@string/home_subtitle"
+            android:textColor="@color/glass_text_secondary"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- 输入区：直接落在渐变上（EditText 自带玻璃背景） -->
     <EditText
         android:id="@+id/etInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:gravity="top|start"
         android:hint="@string/home_input_hint"
-        android:inputType="textMultiLine"
-        android:minLines="3" />
+        android:inputType="textMultiLine|textCapSentences"
+        android:minHeight="96dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -46,26 +67,31 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyle"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginStart="12dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginStart="14dp"
             android:visibility="gone" />
     </LinearLayout>
 
     <Button
         android:id="@+id/btnToConfirm"
-        style="?attr/borderlessButtonStyle"
+        style="@style/Widget.MyApp.Button.Glass"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:text="@string/home_to_confirm" />
 
     <Button
         android:id="@+id/btnToSchedule"
-        style="?attr/borderlessButtonStyle"
+        style="@style/Widget.MyApp.Button.Glass"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="8dp"
         android:text="@string/home_to_schedule" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.4" />
 
 </LinearLayout>

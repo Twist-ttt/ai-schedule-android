@@ -1,92 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- AI 确认页：原始输入引用块 + 玻璃表单 + 保存 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="20dp">
 
+        <!-- 原始输入：玻璃引用块 -->
         <TextView
+            style="@style/TextAppearance.MyApp.Label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="@string/field_source"
-            android:textStyle="bold" />
+            android:text="@string/field_source" />
 
         <TextView
             android:id="@+id/tvSource"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="#555555" />
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_glass_input"
+            android:minHeight="52dp"
+            android:padding="14dp"
+            android:textColor="@color/glass_text_secondary"
+            android:textColorHint="@color/glass_text_hint"
+            android:textIsSelectable="true"
+            android:textSize="14sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/field_title" />
-
-        <EditText
-            android:id="@+id/etTitle"
+        <!-- 表单玻璃面板 -->
+        <LinearLayout
+            style="@style/Widget.MyApp.GlassContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/field_title"
-            android:inputType="text" />
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:padding="20dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/field_date" />
+            <TextView
+                style="@style/TextAppearance.MyApp.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/field_title" />
 
-        <EditText
-            android:id="@+id/etDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/field_date"
-            android:inputType="text" />
+            <EditText
+                android:id="@+id/etTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:hint="@string/field_title"
+                android:inputType="text" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/field_time" />
+            <TextView
+                style="@style/TextAppearance.MyApp.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/field_date" />
 
-        <EditText
-            android:id="@+id/etTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/field_time"
-            android:inputType="text" />
+            <EditText
+                android:id="@+id/etDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:hint="@string/field_date"
+                android:inputType="text" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/field_location" />
+            <TextView
+                style="@style/TextAppearance.MyApp.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/field_time" />
 
-        <EditText
-            android:id="@+id/etLocation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/field_location"
-            android:inputType="text" />
+            <EditText
+                android:id="@+id/etTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:hint="@string/field_time"
+                android:inputType="text" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/field_reminder" />
+            <TextView
+                style="@style/TextAppearance.MyApp.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/field_location" />
 
-        <EditText
-            android:id="@+id/etReminder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/field_reminder"
-            android:inputType="number" />
+            <EditText
+                android:id="@+id/etLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:hint="@string/field_location"
+                android:inputType="text" />
+
+            <TextView
+                style="@style/TextAppearance.MyApp.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/field_reminder" />
+
+            <EditText
+                android:id="@+id/etReminder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:hint="@string/field_reminder"
+                android:inputType="number" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/btnSave"
@@ -94,6 +122,5 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/action_save" />
-
     </LinearLayout>
 </ScrollView>

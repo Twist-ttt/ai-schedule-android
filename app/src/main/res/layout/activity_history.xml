@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 解析历史页：第二个 RecyclerView，列表项为玻璃卡片 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingTop="8dp">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvHistory"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:padding="4dp" />
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="16dp"
+        android:scrollbars="vertical" />
 
     <TextView
         android:id="@+id/tvEmpty"
@@ -16,5 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="@string/empty_history"
+        android:textColor="@color/glass_text_secondary"
+        android:textSize="15sp"
         android:visibility="gone" />
 </FrameLayout>

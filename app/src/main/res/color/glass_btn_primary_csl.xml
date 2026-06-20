@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 主按钮背景：可用时实色强调，禁用时淡化 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:alpha="0.35" android:color="@color/glass_btn_primary" android:state_enabled="false" />
+    <item android:color="@color/glass_btn_primary" />
+</selector>

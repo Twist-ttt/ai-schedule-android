@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 保留旧色，避免破坏既有引用 -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,4 +8,32 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- ===== Glassmorphism 设计令牌（白天 / values） ===== -->
+
+    <!-- 全屏渐变背景：紫 → 靛 → 蓝（白字与玻璃面板均高对比） -->
+    <color name="glass_grad_start">#FF6A11CB</color>
+    <color name="glass_grad_center">#FF3F6EF5</color>
+    <color name="glass_grad_end">#FF2575FC</color>
+
+    <!-- 玻璃面板：半透明白霜 + 亮白细描边 -->
+    <color name="glass_card_fill">#2EFFFFFF</color>
+    <color name="glass_card_stroke">#66FFFFFF</color>
+    <color name="glass_card_stroke_focused">#FFFFFFFF</color>
+
+    <!-- 文本：深岩色系，落在白霜玻璃上清晰可读 -->
+    <color name="glass_text_primary">#FF1E293B</color>
+    <color name="glass_text_secondary">#FF475569</color>
+    <color name="glass_text_hint">#FF64748B</color>
+
+    <!-- 强调色：靛蓝（文字/图标） + 青（提醒，沿用原有 teal 语感） -->
+    <color name="glass_accent">#FF4F46E5</color>
+    <color name="glass_accent_teal">#FF0F8B8D</color>
+
+    <!-- 实色按钮填充（colorPrimary）及其变体 -->
+    <color name="glass_btn_primary">#FF4F46E5</color>
+    <color name="glass_btn_primary_variant">#FF4338CA</color>
+
+    <!-- 浮于渐变之上的图标/标题颜色 -->
+    <color name="glass_icon_on_gradient">#FFFFFFFF</color>
 </resources>

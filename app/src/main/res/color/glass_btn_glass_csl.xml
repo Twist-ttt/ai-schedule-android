@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 次按钮（玻璃描边）背景：半透明霜化 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:alpha="0.45" android:color="@color/glass_card_fill" android:state_enabled="false" />
+    <item android:color="@color/glass_card_fill" />
+</selector>
