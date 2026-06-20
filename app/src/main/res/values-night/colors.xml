@@ -52,4 +52,6 @@
 
     <!-- 顶部 ActionBar：半透明深色条（60%），配白字与白图标 -->
     <color name="glass_appbar_bg">#99000000</color>
+    <!-- ActionBar 底部分隔线 -->
+    <color name="glass_appbar_divider">#33FFFFFF</color>
 </resources>

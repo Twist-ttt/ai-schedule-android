@@ -62,4 +62,6 @@
 
     <!-- 顶部 ActionBar：白霜玻璃条（70%），配深色标题与图标 -->
     <color name="glass_appbar_bg">#B3FFFFFF</color>
+    <!-- ActionBar 底部分隔线：与下方玻璃内容明确分层，避免白霜条与白卡视觉糊在一起 -->
+    <color name="glass_appbar_divider">#1F000000</color>
 </resources>

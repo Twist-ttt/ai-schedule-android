@@ -75,8 +75,8 @@
     <!-- ===== ActionBar：白霜/深色玻璃条（随昼夜）+ 自适应标题与图标 ===== -->
 
     <style name="Widget.MyApp.ActionBar" parent="Widget.MaterialComponents.Light.ActionBar.Solid">
-        <item name="background">@color/glass_appbar_bg</item>
-        <item name="android:background">@color/glass_appbar_bg</item>
+        <item name="background">@drawable/bg_appbar</item>
+        <item name="android:background">@drawable/bg_appbar</item>
         <item name="elevation">0dp</item>
         <item name="titleTextStyle">@style/TextAppearance.MyApp.ActionBar.Title</item>
     </style>

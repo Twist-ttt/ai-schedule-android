@@ -188,3 +188,12 @@
 - **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 11 轮。落地用户反馈的第 4、5 点（玻璃质感加强、输入/按钮层级区分）。
 - **③ 问题与解决**：二级按钮高度差异化（用户建议 44–48dp）未做——MaterialButton 的 inset 与 minHeight 联动复杂、本机无法编译验证，避免把按钮改得过矮；层级改用透明度区分，更稳妥。
 - **验证**：本机无法编译，需你在 Android Studio Sync + Run；重点确认卡片有更明显柔和投影与顶部高光、首页二级按钮明显比输入框更通透。
+
+### `fix(ui): ActionBar 加底部分隔线，与表单玻璃卡明确分层`
+
+- **① 做了什么**（纯资源层，零 Java）：
+  - 新增 `bg_appbar.xml`（layer-list）：白霜填充 + 底部 1dp 分隔线（`glass_appbar_divider` token，昼夜各一套）。ActionBar 样式 `Widget.MyApp.ActionBar` 的 background 由单色 `glass_appbar_bg` 改为此 drawable。
+  - **根因**：半透明白霜 ActionBar（70% 白）与紧贴其下的玻璃表单卡（55% 白）都是白色、无分隔，视觉糊成一块，被误判为"重叠"。
+- **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 12 轮。用户报告"设置页两个白底黑字与 API 配置框重叠"，但 OCR / 图像分析显示该截图文字无实际重叠（"设置"出现一次、"提供方"在其下方）——判定为半透明标题栏与白卡的视觉融合，以底部分隔线强制分层。
+- **③ 问题与解决**：未用 elevation 阴影（经典 ActionBar 的 elevation 阴影渲染不稳定），改用 layer-list 底部 1dp 描边，确定性更强。
+- **验证**：本机无法编译，需你在 Android Studio **Build → Rebuild Project 后重新安装运行**（上一轮 safe-area 修复在 Java 代码 commit `aff3fbe`，必须重新编译才生效）。重点确认 ActionBar 下方有一道细分隔线、标题栏与表单不再糊成一块。

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ActionBar 背景：霜化填充 + 底部细分隔线
+     半透明白霜条与下方玻璃卡片都是白色，无分隔时视觉糊成一块（被误判为"重叠"）；
+     底部 1dp 分隔线强制分层，让标题栏与表单明确分离。昼夜各一套 token。 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 主体：白霜填充 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/glass_appbar_bg" />
+        </shape>
+    </item>
+    <!-- 底部分隔线 -->
+    <item android:gravity="bottom">
+        <shape android:shape="rectangle">
+            <size android:height="1dp" />
+            <solid android:color="@color/glass_appbar_divider" />
+        </shape>
+    </item>
+</layer-list>
