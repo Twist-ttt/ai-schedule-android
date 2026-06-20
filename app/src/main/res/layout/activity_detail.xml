@@ -1,116 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 日程详情页：玻璃表单 + 更新/删除 -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- 日程详情页：玻璃 Toolbar + 玻璃表单 + 更新/删除 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:paddingTop="?attr/actionBarSize">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/bg_appbar"
+        app:elevation="0dp"
+        app:title="@string/detail_title"
+        app:titleTextColor="@color/glass_text_primary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
-            style="@style/Widget.MyApp.GlassContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:orientation="vertical"
             android:padding="20dp">
 
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/field_title" />
-
-            <EditText
-                android:id="@+id/etTitle"
+            <LinearLayout
+                style="@style/Widget.MyApp.GlassContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:inputType="text" />
+                android:layout_marginTop="4dp"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/field_date" />
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/field_title" />
 
-            <EditText
-                android:id="@+id/etDate"
+                <EditText
+                    android:id="@+id/etTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:inputType="text" />
+
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/field_date" />
+
+                <EditText
+                    android:id="@+id/etDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:inputType="text" />
+
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/field_time" />
+
+                <EditText
+                    android:id="@+id/etTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:inputType="text" />
+
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/field_location" />
+
+                <EditText
+                    android:id="@+id/etLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:inputType="text" />
+
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/field_reminder" />
+
+                <EditText
+                    android:id="@+id/etReminder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:inputType="text" />
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
 
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/field_time" />
+                <Button
+                    android:id="@+id/btnUpdate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/action_update" />
 
-            <EditText
-                android:id="@+id/etTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:inputType="text" />
-
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/field_location" />
-
-            <EditText
-                android:id="@+id/etLocation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:inputType="text" />
-
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/field_reminder" />
-
-            <EditText
-                android:id="@+id/etReminder"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:inputType="number" />
+                <Button
+                    android:id="@+id/btnDelete"
+                    style="@style/Widget.MyApp.Button.Glass"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/action_delete" />
+            </LinearLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btnUpdate"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/action_update" />
-
-            <Button
-                android:id="@+id/btnDelete"
-                style="@style/Widget.MyApp.Button.Glass"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_weight="1"
-                android:text="@string/action_delete" />
-        </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</LinearLayout>

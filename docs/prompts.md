@@ -132,6 +132,15 @@
   - **修复**：6 个布局根加 `paddingTop="?attr/actionBarSize"`，把内容精确推到 ActionBar 下方（actionBarSize 即 ActionBar 自身高度）。一行属性、零 Java、零主题改动。
   - **取舍**：未上 NoActionBar+Toolbar 大重构（文件多、本机不可编译、风险高），先用最小风险的 padding 精准修复。
 
+### 第 14 轮（阶段 6 收尾续，对应 commit `fix(ui): 取消装饰层 ActionBar 改 MaterialToolbar`）
+
+- **提示词原文**：用户质问"装饰层 ActionBar 和布局内容还是重叠了，这两不应该不重叠吗？就目前的情况，不应该有重叠部分，因为布局内容很少。你能理解我的意思吗"。
+- **解决的问题**：装饰层 ActionBar 与内容层重叠（前几轮 padding 补丁治标不治本）。
+- **AI 生成结果与我的修改**：
+  - **确认用户判断**：两层本就不该重叠；edge-to-edge 让内容框架铺满全屏、装饰层 ActionBar 叠在内容之上，才是重叠根因。继续在两层架构上猜偏移无解。
+  - **架构层面消除重叠**：主题改 `NoActionBar`（取消装饰层 ActionBar）；每页布局内放 `MaterialToolbar`（标题进入内容层）；`BaseActivity` 拥抱 edge-to-edge + 把系统栏 inset 作为内容根 padding。标题与内容同层纵向堆叠，重叠结构上不可能。
+  - **取舍**：改动大、本机不可编译，做成原子提交便于回退；保留 `setSupportActionBar` 以沿用原溢出菜单（历史/设置/测试通知）。
+
 ## RecyclerView
 
 （阶段 2 起，记录日程列表 Adapter、解析历史列表 Adapter 的提示词。）

@@ -206,3 +206,15 @@
 - **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 13 轮。用户用"显示布局边界"诊断后明确告知：标题在状态栏下、与 June 2026 重叠、处于上层——据此精确定位为"内容画到 ActionBar 后面"。
 - **③ 问题与解决**：未用 NoActionBar+Toolbar 大重构（13 文件、本机不可编译验证、风险高）；先用最小风险的一行 padding 精准修复，等价于把内容手动推到 ActionBar 下方。
 - **验证**：本机无法编译，需你在 Android Studio **Rebuild + 重装**；重点确认看板页"June 2026"落在"日程看板"标题下方、不再重叠，设置页 provider 落在标题下方。若个别页面仍有偏差（actionBarSize 与实机 ActionBar 高度不符），告诉我具体页面，微调即可。
+
+### `fix(ui): 取消装饰层 ActionBar，标题改入内容层 MaterialToolbar——根治重叠`
+
+- **① 做了什么**：
+  - **主题** `Theme.MyApplication` 父主题 `DarkActionBar`→`NoActionBar`（values + values-night），取消会与内容重叠的装饰层 ActionBar。
+  - **BaseActivity** 重写：① `setDecorFitsSystemWindows(false)` 拥抱 edge-to-edge；② 重写 `setContentView`，把布局里的 `MaterialToolbar` 设为 ActionBar（`setSupportActionBar`，标题/菜单由此承载）；③ 用 `WindowInsetsCompat` 把系统栏 inset 作为内容根 `padding`——Toolbar 落在状态栏下方、内容落在 Toolbar 下方。
+  - **6 个布局**统一改造：根容器改为垂直 LinearLayout，首子视图为 `MaterialToolbar`（id=toolbar，背景沿用 bg_appbar 含底部分隔线），原内容作为第二子视图（ScrollView/FrameLayout/CoordinatorLayout 用 height=0dp+weight=1 填充）。所有控件 ID、文本、样式不变（已 grep 自检）。
+- **根因（用户诊断确认 + 分析）**：targetSdk 36 强制 edge-to-edge，内容框架从窗口顶 y=0 铺满，装饰层 ActionBar 叠在内容之上——内容画到 ActionBar 后面，半透明时标题与内容重叠。在"装饰层 ActionBar + 内容"两层架构上猜偏移（前几轮 statusBar/actionBarSize padding）永远差一截。
+- **为什么这次能根治**：标题与内容**同在内容层、纵向堆叠**（Toolbar 是布局首子视图，内容是其后续兄弟），重叠在结构上不可能。不再依赖任何猜出来的偏移量。
+- **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 14 轮。用户质问"装饰层 ActionBar 和布局内容这两不应该不重叠吗"——确认应从架构层面消除两层重叠，而非继续打 padding 补丁。
+- **③ 问题与解决**：改动较大（主题+基类+6 布局）、本机不可编译，做成原子提交便于整笔 `git revert`；MaterialToolbar 走 `setSupportActionBar` 保留原溢出菜单（历史/设置/测试通知）。
+- **验证**：本机无法编译，需你在 Android Studio **Rebuild + 重装**；重点确认：① 各页标题在状态栏下方、与内容不再重叠；② 首页/看板页右上角溢出菜单（⋮）仍可用。若启动崩溃，把 logcat 报错发我，或 `git revert HEAD` 整笔回退到上一版。

@@ -1,127 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- AI 确认页：原始输入引用块 + 玻璃表单 + 保存 -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- AI 确认页：玻璃 Toolbar + 原始输入引用块 + 玻璃表单 + 保存 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:paddingTop="?attr/actionBarSize">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/bg_appbar"
+        app:elevation="0dp"
+        app:title="@string/confirm_title"
+        app:titleTextColor="@color/glass_text_primary" />
 
-        <!-- 原始输入：玻璃引用块 -->
-        <TextView
-            style="@style/TextAppearance.MyApp.Label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/field_source" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
-        <TextView
-            android:id="@+id/tvSource"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:background="@drawable/bg_glass_input"
-            android:minHeight="52dp"
-            android:padding="14dp"
-            android:textColor="@color/glass_text_secondary"
-            android:textColorHint="@color/glass_text_hint"
-            android:textIsSelectable="true"
-            android:textSize="14sp" />
-
-        <!-- 表单玻璃面板 -->
         <LinearLayout
-            style="@style/Widget.MyApp.GlassContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:orientation="vertical"
             android:padding="20dp">
 
+            <!-- 原始输入：玻璃引用块 -->
             <TextView
                 style="@style/TextAppearance.MyApp.Label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/field_title" />
-
-            <EditText
-                android:id="@+id/etTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:hint="@string/field_title"
-                android:inputType="text" />
+                android:layout_marginTop="4dp"
+                android:text="@string/field_source" />
 
             <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/field_date" />
-
-            <EditText
-                android:id="@+id/etDate"
+                android:id="@+id/tvSource"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:hint="@string/field_date"
-                android:inputType="text" />
+                android:background="@drawable/bg_glass_input"
+                android:minHeight="52dp"
+                android:padding="14dp"
+                android:textColor="@color/glass_text_secondary"
+                android:textColorHint="@color/glass_text_hint"
+                android:textIsSelectable="true"
+                android:textSize="14sp" />
 
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/field_time" />
-
-            <EditText
-                android:id="@+id/etTime"
+            <!-- 表单玻璃面板 -->
+            <LinearLayout
+                style="@style/Widget.MyApp.GlassContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:hint="@string/field_time"
-                android:inputType="text" />
+                android:layout_marginTop="16dp"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/field_location" />
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/field_title" />
 
-            <EditText
-                android:id="@+id/etLocation"
+                <EditText
+                    android:id="@+id/etTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:hint="@string/field_title"
+                    android:inputType="text" />
+
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/field_date" />
+
+                <EditText
+                    android:id="@+id/etDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:hint="@string/field_date"
+                    android:inputType="text" />
+
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/field_time" />
+
+                <EditText
+                    android:id="@+id/etTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:hint="@string/field_time"
+                    android:inputType="text" />
+
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/field_location" />
+
+                <EditText
+                    android:id="@+id/etLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:hint="@string/field_location"
+                    android:inputType="text" />
+
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/field_reminder" />
+
+                <EditText
+                    android:id="@+id/etReminder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:hint="@string/field_reminder"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnSave"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:hint="@string/field_location"
-                android:inputType="text" />
-
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/field_reminder" />
-
-            <EditText
-                android:id="@+id/etReminder"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:hint="@string/field_reminder"
-                android:inputType="number" />
+                android:layout_marginTop="16dp"
+                android:text="@string/action_save" />
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btnSave"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/action_save" />
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</LinearLayout>

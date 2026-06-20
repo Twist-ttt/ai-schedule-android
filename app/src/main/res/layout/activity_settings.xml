@@ -1,86 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 设置页：LLM 配置玻璃表单 -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- 设置页：玻璃 Toolbar + LLM 配置玻璃表单 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:paddingTop="?attr/actionBarSize">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/bg_appbar"
+        app:elevation="0dp"
+        app:title="@string/settings_title"
+        app:titleTextColor="@color/glass_text_primary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
-            style="@style/Widget.MyApp.GlassContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:orientation="vertical"
             android:padding="20dp">
 
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/field_provider" />
-
-            <EditText
-                android:id="@+id/etProvider"
+            <LinearLayout
+                style="@style/Widget.MyApp.GlassContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:inputType="text" />
+                android:layout_marginTop="4dp"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/field_baseurl" />
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/field_provider" />
 
-            <EditText
-                android:id="@+id/etBaseUrl"
+                <EditText
+                    android:id="@+id/etProvider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:inputType="text" />
+
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/field_baseurl" />
+
+                <EditText
+                    android:id="@+id/etBaseUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:inputType="textUri" />
+
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/field_model" />
+
+                <EditText
+                    android:id="@+id/etModel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:inputType="text" />
+
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/field_apikey" />
+
+                <EditText
+                    android:id="@+id/etApiKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:inputType="textPassword" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnSave"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:inputType="textUri" />
-
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/field_model" />
-
-            <EditText
-                android:id="@+id/etModel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:inputType="text" />
-
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/field_apikey" />
-
-            <EditText
-                android:id="@+id/etApiKey"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:inputType="textPassword" />
+                android:layout_marginTop="16dp"
+                android:text="@string/action_save_config" />
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btnSave"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/action_save_config" />
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</LinearLayout>
