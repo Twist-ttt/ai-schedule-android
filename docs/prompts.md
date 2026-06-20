@@ -123,6 +123,15 @@
   - **取舍**：不用 elevation 阴影（经典 ActionBar 渲染不稳），用描边线更确定。
   - **提醒用户**：safe-area 修复在 Java 代码（commit `aff3fbe`），须 Rebuild + 重装才生效。
 
+### 第 13 轮（阶段 6 收尾续，对应 commit `fix(ui): 内容根 paddingTop=actionBarSize`）
+
+- **提示词原文**：用户按建议开了"显示布局边界"，诊断结果："（日程看板标题）在状态栏下，与 June 2026 重叠，但处于上层"。
+- **解决的问题**：布局内容画到装饰层 ActionBar 后面，标题盖住内容顶部。
+- **AI 生成结果与我的修改**：
+  - **定位**：用户诊断确认——标题（ActionBar，装饰层）位置正确（状态栏下方），但布局内容（June 2026）画到了它后面，ActionBar 在上层 z 序。说明 edge-to-edge 下内容框架没有自动避开 ActionBar（`setDecorFitsSystemWindows` 只管系统栏，不管装饰层 ActionBar 偏移）。
+  - **修复**：6 个布局根加 `paddingTop="?attr/actionBarSize"`，把内容精确推到 ActionBar 下方（actionBarSize 即 ActionBar 自身高度）。一行属性、零 Java、零主题改动。
+  - **取舍**：未上 NoActionBar+Toolbar 大重构（文件多、本机不可编译、风险高），先用最小风险的 padding 精准修复。
+
 ## RecyclerView
 
 （阶段 2 起，记录日程列表 Adapter、解析历史列表 Adapter 的提示词。）

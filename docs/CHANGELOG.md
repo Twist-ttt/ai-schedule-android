@@ -197,3 +197,12 @@
 - **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 12 轮。用户报告"设置页两个白底黑字与 API 配置框重叠"，但 OCR / 图像分析显示该截图文字无实际重叠（"设置"出现一次、"提供方"在其下方）——判定为半透明标题栏与白卡的视觉融合，以底部分隔线强制分层。
 - **③ 问题与解决**：未用 elevation 阴影（经典 ActionBar 的 elevation 阴影渲染不稳定），改用 layer-list 底部 1dp 描边，确定性更强。
 - **验证**：本机无法编译，需你在 Android Studio **Build → Rebuild Project 后重新安装运行**（上一轮 safe-area 修复在 Java 代码 commit `aff3fbe`，必须重新编译才生效）。重点确认 ActionBar 下方有一道细分隔线、标题栏与表单不再糊成一块。
+
+### `fix(ui): 内容根加 paddingTop=actionBarSize，根治与 ActionBar 重叠`
+
+- **① 做了什么**（纯资源层，零 Java）：6 个布局的根容器统一加 `android:paddingTop="?attr/actionBarSize"`（首页 LinearLayout / 设置·详情·确认 ScrollView / 历史 FrameLayout / 看板 CoordinatorLayout）。
+- **根因（用户诊断确认）**：targetSdk 36 强制 edge-to-edge 下，内容框架虽落在状态栏下方，却**不自动避开装饰层 ActionBar**——布局内容画到半透明 ActionBar 后面，ActionBar 在上层，故"日程看板"标题与"June 2026"重叠。`setDecorFitsSystemWindows(true)` 只管系统栏（状态/导航），管不到装饰层 ActionBar 的偏移。
+- **修复**：内容根顶部留出一个 ActionBar 高度（`?attr/actionBarSize`，即 ActionBar 自身高度），把内容精确推到 ActionBar 下方。无需改主题/布局结构/Java，每页一行属性。
+- **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 13 轮。用户用"显示布局边界"诊断后明确告知：标题在状态栏下、与 June 2026 重叠、处于上层——据此精确定位为"内容画到 ActionBar 后面"。
+- **③ 问题与解决**：未用 NoActionBar+Toolbar 大重构（13 文件、本机不可编译验证、风险高）；先用最小风险的一行 padding 精准修复，等价于把内容手动推到 ActionBar 下方。
+- **验证**：本机无法编译，需你在 Android Studio **Rebuild + 重装**；重点确认看板页"June 2026"落在"日程看板"标题下方、不再重叠，设置页 provider 落在标题下方。若个别页面仍有偏差（actionBarSize 与实机 ActionBar 高度不符），告诉我具体页面，微调即可。
