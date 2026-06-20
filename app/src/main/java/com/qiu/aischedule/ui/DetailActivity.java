@@ -16,7 +16,7 @@ import com.qiu.aischedule.util.DateUtils;
  * 详情编辑页：查看 / 修改 / 删除单条日程。
  * 更新后重新设置提醒；删除后取消提醒。看板页经 ContentProvider 自动刷新。
  */
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends BaseActivity {
 
     public static final String EXTRA_EVENT_ID = "extra_event_id";
 

@@ -16,7 +16,7 @@ import com.qiu.aischedule.ui.adapter.HistoryAdapter;
  * 解析历史页：第二个 RecyclerView，展示每次"原句 → AI 返回 JSON"。
  * 数据来自 Room LiveData，自动刷新。
  */
-public class HistoryActivity extends AppCompatActivity {
+public class HistoryActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

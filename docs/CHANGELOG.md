@@ -168,3 +168,13 @@
 - **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 9 轮。依据用户给出的完整 glassmorphism 规格逐条落地优先级 ②（背景光斑）与 ③（卡片/输入/按钮统一玻璃组件）。
 - **③ 问题与解决**：纯 XML 无 backdrop blur——继续沿用"霜+顶光+描边+柔和投影"近似，不引入 BlurView/RenderEffect；用 radial gradient 近似模糊光斑，`gradientRadius` 用 dp 维度以适配不同密度。主按钮渐变需自定义 background drawable 且会破坏 Material 涟漪/圆角，本机无法编译验证，故保留实色仅精修圆角与投影。
 - **验证**：本机无法编译，需你在 Android Studio Sync + Run；重点确认：首页/设置页背景能看到三处彩色光晕、玻璃面板有柔和靛蓝投影与明显圆角、输入框聚焦时靛蓝描边、二级按钮比卡片更通透。已自检所有 `@color/` token 在 day/night 双套齐全、无悬空引用。
+
+### `fix(ui): 顶部安全区——运行时显式 setDecorFitsSystemWindows(true)`
+
+- **① 做了什么**：
+  - 新增 `ui/BaseActivity`（抽象基类，继承 AppCompatActivity）：在 `onCreate` 运行时调用 `WindowCompat.setDecorFitsSystemWindows(getWindow(), true)`，显式要求内容不侵入系统栏。
+  - 6 个 Activity（MainActivity / SettingsActivity / ScheduleListActivity / HistoryActivity / AiConfirmActivity / DetailActivity）改为继承 `BaseActivity`（同包，免 import）；各自 `onCreate` 首行 `super.onCreate` 即触发基类的 inset 处理，在 `setContentView` 前生效。
+  - **根因修复**：targetSdk 36（API 35+）默认强制 edge-to-edge，且**忽略主题里的 `windowOptOutEdgeToEdgeEnforcement`**——所以上一轮"状态栏实色 + marginTop"没根治：内容（设置页 provider、看板页 "June 2026"）仍画到状态栏 / 刘海区域下方。运行时 `setDecorFitsSystemWindows(true)` 是 SDK35+ 下覆盖该默认值的权威方式，让系统栏保持不透明占位，ActionBar 标题与页面内容都落在状态栏下方。
+- **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 10 轮。用户明确指出这是"布局没吃到 Scaffold innerPadding / 没加 statusBarsPadding"的 inset 问题，非配色问题；翻译到本项目 Java+View 技术栈即 setDecorFitsSystemWindows。
+- **③ 问题与解决**：用户提示词里用 Compose（Scaffold / statusBarsPadding）描述——本项目是 AppCompatActivity+XML，不能直接用；以运行时 setDecorFitsSystemWindows 等价实现"内容避开系统栏"。
+- **验证**：本机无法编译，需你在 Android Studio Sync + Run；重点确认 ① 设置页 provider 在"设置"标题下方、不进状态栏；② 看板页 "June 2026" 月份栏在日历卡片内、远离摄像头打孔。若个别 API35+ 设备仍重叠，则需进一步改 NoActionBar+Toolbar+WindowInsetsListener（本轮先用最小风险的运行时调用）。

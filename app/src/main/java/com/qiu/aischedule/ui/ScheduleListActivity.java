@@ -36,7 +36,7 @@ import java.util.List;
  * 再映射为 EventRecord。注册 ContentObserver：Repository 写入并 notifyChange 后自动重新查询刷新。
  * 这样既满足"ContentProvider 通过 URI 访问数据"，又保留"修改/删除后界面刷新"。
  */
-public class ScheduleListActivity extends AppCompatActivity {
+public class ScheduleListActivity extends BaseActivity {
 
     private final List<EventRecord> allEvents = new ArrayList<>();
     private long selectedDayStart;

@@ -93,6 +93,16 @@
   - **取舍**：主按钮渐变需自定义 background drawable，会破坏 Material 涟漪/圆角、且本机无法编译验证——保留实色靛蓝，仅精修圆角与投影（用户也认可"可保留强主按钮"）。
   - 保持纯资源层、零 Java、不增依赖；列表项走 `GlassContainer` 全局自动生效。
 
+### 第 10 轮（阶段 6 收尾续，对应 commit `fix(ui): 顶部安全区 setDecorFitsSystemWindows`）
+
+- **提示词原文**：用户指出上一版"设置页顶部仍被状态栏 / 刘海压住（provider 钻进状态栏）、看板页 June 2026 贴近摄像头打孔"，明确这是"布局没吃到 Scaffold innerPadding / 没加 statusBarsPadding"的 inset 问题，而非配色；要求内容必须从 AppBar 下方开始，不能进状态栏。
+- **解决的问题**：内容画到状态栏 / 刘海区域下方。
+- **AI 生成结果与我的修改**：
+  - **根因**：targetSdk 36（API35+）强制 edge-to-edge 且忽略主题 `windowOptOutEdgeToEdgeEnforcement`——上一轮"状态栏实色 + 加 marginTop"治标不治本，内容仍被推到系统栏下。
+  - **翻译**：用户用 Compose 术语（Scaffold innerPadding / statusBarsPadding）描述，但本项目是 AppCompatActivity+XML（非 Compose）——等价方案是运行时 `WindowCompat.setDecorFitsSystemWindows(true)`。
+  - **实现**：新增 `BaseActivity`，6 个 Activity 改继承它；运行时显式要求内容不侵入系统栏（权威覆盖 SDK35+ 默认 edge-to-edge）。保持 DarkActionBar 主题与实色状态栏，ActionBar 标题与表单 / 日历都落在状态栏下方。
+  - **取舍**：先用最小风险的运行时调用；若个别 API35+ 设备仍重叠，再升级为 NoActionBar+Toolbar+WindowInsetsListener（需设备验证，故未一次到位）。
+
 ## RecyclerView
 
 （阶段 2 起，记录日程列表 Adapter、解析历史列表 Adapter 的提示词。）

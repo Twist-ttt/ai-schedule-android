@@ -15,7 +15,7 @@ import com.qiu.aischedule.security.SecretStore;
  * 设置页：配置 LLM provider / baseUrl / model，以及 API Key。
  * provider/baseUrl/model 存 Room 的 api_config 表；API Key 用 EncryptedSharedPreferences 加密存储。
  */
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends BaseActivity {
 
     private ScheduleRepository repo;
 

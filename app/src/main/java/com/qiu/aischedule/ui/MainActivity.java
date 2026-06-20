@@ -29,7 +29,7 @@ import com.qiu.aischedule.notify.ReminderScheduler;
  * - 「我的日程」进入看板页；菜单提供 测试通知 / 历史 / 设置。
  * 首次进入请求 POST_NOTIFICATIONS（Android 13+ 通知所需运行时权限）。
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private static final int REQ_POST_NOTIFICATIONS = 1001;
 

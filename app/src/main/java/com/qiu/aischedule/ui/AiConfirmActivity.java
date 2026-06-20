@@ -21,7 +21,7 @@ import com.qiu.aischedule.util.DateUtils;
  * - 由「手动填写」进入：字段可手动编辑（降级路径）。
  * 保存：后台线程写入数据库；若 reminderMinutes>0 且提醒时间在未来，则用 AlarmManager 设置提醒。
  */
-public class AiConfirmActivity extends AppCompatActivity {
+public class AiConfirmActivity extends BaseActivity {
 
     public static final String EXTRA_SOURCE_TEXT = "extra_source_text";
     public static final String EXTRA_TITLE = "extra_title";
