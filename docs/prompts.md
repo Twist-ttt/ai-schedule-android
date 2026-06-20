@@ -62,6 +62,16 @@
   - 让 AI 只改 5 个资源 token 文件（colors day/night、themes day/night、styles），所有 drawable 与布局零改动（已确认布局无硬编码颜色），全局自动生效。
   - 同步处理 ActionBar 翻转的连锁项（标题色、图标色、状态栏图标昼夜分离），避免"白字落在白霜上看不见"。
 
+### 第 7 轮（阶段 6 收尾续，对应 commit `fix(ui): 状态栏实色化 + 玻璃面板顶部光泽`）
+
+- **提示词原文**：「1、[设置页截图] 你看文字之间挡住了，而且多个页面都会有这个问题。2、没有 glassmorphism 的 UI 效果，我有专门的 SKILL 的。」
+- **解决的问题**：①实机顶部状态栏（时间/电量）与 ActionBar 标题在多页重叠；②卡片仍像"浅蓝块"，缺少玻璃质感。
+- **AI 生成结果与我的修改**：
+  - 调用了 ui-ux-pro-max skill 取规范（其 `safe-area-awareness`/`system-bar-clearance`/`effects-match-style` 规则）。
+  - **重叠根因**：`statusBarColor=transparent` + 渐变穿透 + `windowOptOutEdgeToEdgeEnforcement` 在 targetSdk 36 下不稳定（部分设备 opt-out 失效被强制 edge-to-edge，标题侵入状态栏）。修复：状态栏改实色（= 渐变顶端色 token `glass_status_bar`，昼夜各一套），强制系统把状态栏当不透明区域，内容自动在其下方。
+  - **玻璃质感**：纯 XML 无 backdrop blur，改用 `layer-list` 在 `bg_glass_card.xml` 叠"霜 + 顶部高光渐变 + 描边"近似毛玻璃（新增 `glass_highlight_top` token，昼夜强弱不同）；霜透明度 65%→60% 让淡彩渐变更透出。
+  - 保持纯资源层、零 Java、不增依赖；item 列表项本就走 `GlassContainer`，全局自动生效。
+
 ## RecyclerView
 
 （阶段 2 起，记录日程列表 Adapter、解析历史列表 Adapter 的提示词。）

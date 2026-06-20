@@ -138,3 +138,13 @@
 - **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 6 轮。要点：背景是纯渐变而非图片，故不需要真 backdrop blur——把底做淡、霜做厚，glassmorphism 观感即达成，仍保持纯资源层、不增依赖。
 - **③ 问题与解决**：ActionBar 由"黑底白字"翻转为"白霜底深字"时，标题、返回/溢出图标、状态栏图标三处颜色须联动（否则白字落在白霜上看不见）——通过 `glass_text_primary` token + `windowLightStatusBar` 昼夜分离一次性解决。
 - **验证**：本机无 java/gradle，构建由你在 Android Studio 中 Sync + Run 确认；改动仅涉及 `values/colors.xml`、`values-night/colors.xml`、`values/themes.xml`、`values-night/themes.xml`、`values/styles.xml` 五个资源文件，无 Java/XML 结构变更，风险面小。
+
+### `fix(ui): 状态栏实色化（修复顶部与标题重叠）+ 玻璃面板加顶部光泽层`
+
+- **① 做了什么**（纯资源层，零 Java）：
+  - **修复顶部重叠**：`statusBarColor` 由 `transparent` 改为实色 token `glass_status_bar`（白天 `#EEF2FF` = 渐变顶端淡薰衣草 / 夜间 `#1B1538` = 深靛），强制系统将状态栏视为不透明区域，ActionBar 标题物理上落在其下方，根治"状态栏时间/电量与标题在多页重叠"。
+  - **玻璃质感增强**：`bg_glass_card.xml` 由单一半透明 shape 改为 `layer-list`——主体霜层 + 顶部高光渐变（白→透明，模拟玻璃顶光）+ 纯白描边 + 大圆角；新增 `glass_highlight_top` token（白天 `#66FFFFFF` / 夜间 `#33FFFFFF`）。所有用 `GlassContainer` 的卡片（首页 Hero、设置表单、看板/历史列表项）全局自动生效。
+  - **霜透明度微调**：白天 65%→60%（`#A6FFFFFF`→`#99FFFFFF`），让淡彩渐变更透出，增强通透感；文字对比仍 >10:1。
+- **② AI 提示词与修改**：见 `prompts.md`「界面设计」第 7 轮。调用了 ui-ux-pro-max skill，依据其 `safe-area-awareness`、`system-bar-clearance`、`effects-match-style` 规则。
+- **③ 问题与解决**：视觉分析/OCR 工具均报告"状态栏与标题未重叠"，但实机用户明确看到重叠——以实机为准；定位为"透明状态栏 + edge-to-edge opt-out 在 targetSdk 36 下不稳定"的已知脆弱组合，以"状态栏实色化"根治。
+- **验证**：本机无法编译，需你在 Android Studio Sync + Run；重点确认设置页/首页/看板顶部状态栏与标题不再重叠，卡片有明显玻璃光泽。

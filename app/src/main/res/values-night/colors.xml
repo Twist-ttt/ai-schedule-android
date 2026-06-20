@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- ===== Glassmorphism 设计令牌（夜间 / values-night） ===== -->
-    <!-- 深邃靛蓝渐变保留；霜与描边同步提厚，衬托近白文字 -->
+    <!-- 深邃靛蓝渐变保留；霜与描边同步加厚，衬托近白文字 -->
+
+    <!-- 状态栏背景：实色（= 渐变顶端深靛），让顶部系统栏与 ActionBar 标题物理分离 -->
+    <color name="glass_status_bar">#FF1B1538</color>
 
     <!-- 深邃靛蓝渐变，衬托白色玻璃面板 -->
     <color name="glass_grad_start">#FF1B1538</color>
     <color name="glass_grad_center">#FF2A2466</color>
     <color name="glass_grad_end">#FF3D2A8E</color>
 
-    <!-- 玻璃面板：深霜（50%）+ 微白描边（60%），白字落其上清晰 -->
+    <!-- 玻璃面板：深霜（50%）+ 微白描边（60%）+ 顶部微光，白字落其上清晰 -->
     <color name="glass_card_fill">#80222A52</color>
     <color name="glass_card_stroke">#99FFFFFF</color>
     <color name="glass_card_stroke_focused">#FFA5B4FC</color>
+    <!-- 玻璃顶部光泽渐变起点：夜间弱化 -->
+    <color name="glass_highlight_top">#33FFFFFF</color>
 
     <!-- 文本：近白色系 -->
     <color name="glass_text_primary">#FFF1F5F9</color>

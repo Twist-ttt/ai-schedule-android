@@ -4,8 +4,8 @@
         <!-- 窗口背景：全屏渐变 -->
         <item name="android:windowBackground">@drawable/bg_app_gradient</item>
 
-        <!-- 状态栏透明 + 深色图标（白天底色偏淡），渐变穿透至顶部 -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- 状态栏实色（= 渐变顶端色）+ 深色图标：让顶部系统栏与 ActionBar 标题物理分离，避免重叠 -->
+        <item name="android:statusBarColor">@color/glass_status_bar</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <!-- 关闭 Android 15+ 强制 edge-to-edge，避免内容侵入状态栏 -->
