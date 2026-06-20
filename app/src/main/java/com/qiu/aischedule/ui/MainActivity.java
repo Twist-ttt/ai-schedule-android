@@ -67,6 +67,7 @@ public class MainActivity extends BaseActivity {
                                 Toast.LENGTH_LONG).show();
                     }
                     Intent intent = new Intent(MainActivity.this, AiConfirmActivity.class);
+                    intent.putExtra(AiConfirmActivity.EXTRA_MODE, AiConfirmActivity.MODE_AI);
                     intent.putExtra(AiConfirmActivity.EXTRA_SOURCE_TEXT, text);
                     intent.putExtra(AiConfirmActivity.EXTRA_TITLE, parsed.title);
                     intent.putExtra(AiConfirmActivity.EXTRA_DATE, parsed.date);
@@ -86,9 +87,8 @@ public class MainActivity extends BaseActivity {
         });
 
         btnToConfirm.setOnClickListener(v -> {
-            String text = etInput.getText().toString().trim();
             Intent intent = new Intent(this, AiConfirmActivity.class);
-            intent.putExtra(AiConfirmActivity.EXTRA_SOURCE_TEXT, text);
+            intent.putExtra(AiConfirmActivity.EXTRA_MODE, AiConfirmActivity.MODE_MANUAL);
             startActivity(intent);
         });
 

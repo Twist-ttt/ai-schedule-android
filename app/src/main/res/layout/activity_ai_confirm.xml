@@ -27,26 +27,33 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- 原始输入：玻璃引用块 -->
-            <TextView
-                style="@style/TextAppearance.MyApp.Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/field_source" />
-
-            <TextView
-                android:id="@+id/tvSource"
+            <!-- 原始输入：玻璃引用块（仅 AI 模式显示；手动填写隐藏） -->
+            <LinearLayout
+                android:id="@+id/sourceBlock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:background="@drawable/bg_glass_input"
-                android:minHeight="52dp"
-                android:padding="14dp"
-                android:textColor="@color/glass_text_secondary"
-                android:textColorHint="@color/glass_text_hint"
-                android:textIsSelectable="true"
-                android:textSize="14sp" />
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.MyApp.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/field_source" />
+
+                <TextView
+                    android:id="@+id/tvSource"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_glass_input"
+                    android:minHeight="52dp"
+                    android:padding="14dp"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textIsSelectable="true"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
             <!-- 表单玻璃面板 -->
             <LinearLayout

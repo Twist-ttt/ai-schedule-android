@@ -6,7 +6,7 @@
     <string name="home_subtitle">把一句话，变成可提醒的日程</string>
     <string name="home_input_hint">输入一句话，例如：明天9点英语演讲练习，地点图书馆</string>
     <string name="home_ai_parse">AI 解析</string>
-    <string name="home_to_confirm">解析 / 手动填写</string>
+    <string name="home_to_confirm">手动填写</string>
     <string name="home_to_schedule">我的日程</string>
 
     <!-- 菜单 -->
@@ -16,6 +16,7 @@
 
     <!-- 确认页 -->
     <string name="confirm_title">确认日程</string>
+    <string name="manual_confirm_title">新建日程</string>
     <string name="manual_entry_hint">（手动填写：直接编辑下方字段）</string>
     <string name="field_source">原始输入</string>
     <string name="field_title">标题</string>

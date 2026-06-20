@@ -77,8 +77,11 @@ public class ScheduleListActivity extends BaseActivity {
             applyFilter();
         });
 
-        findViewById(R.id.fabAdd).setOnClickListener(v ->
-                startActivity(new Intent(this, AiConfirmActivity.class)));
+        findViewById(R.id.fabAdd).setOnClickListener(v -> {
+            Intent intent = new Intent(this, AiConfirmActivity.class);
+            intent.putExtra(AiConfirmActivity.EXTRA_MODE, AiConfirmActivity.MODE_MANUAL);
+            startActivity(intent);
+        });
 
         // 通过 ContentProvider 读取
         loadFromProvider();

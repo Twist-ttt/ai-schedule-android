@@ -2,6 +2,7 @@ package com.qiu.aischedule.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +32,11 @@ public class AiConfirmActivity extends BaseActivity {
     public static final String EXTRA_REMINDER = "extra_reminder";
     public static final String EXTRA_HISTORY_ID = "extra_history_id";
 
+    /** 进入模式：AI 解析回填 / 手动填写。决定标题与「原始输入」引用块是否显示。 */
+    public static final String EXTRA_MODE = "extra_mode";
+    public static final int MODE_AI = 0;
+    public static final int MODE_MANUAL = 1;
+
     private ScheduleRepository repo;
     private long historyId = -1L;
 
@@ -42,10 +48,21 @@ public class AiConfirmActivity extends BaseActivity {
         repo = ScheduleRepository.getInstance(this);
 
         Intent it = getIntent();
+        int mode = it.getIntExtra(EXTRA_MODE, MODE_MANUAL); // 漏传时退化为自洽的「新建」表单
+        boolean isAi = (mode == MODE_AI);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(isAi ? R.string.confirm_title : R.string.manual_confirm_title);
+        }
+
         String sourceText = it.getStringExtra(EXTRA_SOURCE_TEXT);
+        // 「原始输入」引用块仅 AI 模式显示——手动填写就是普通新建表单
+        findViewById(R.id.sourceBlock).setVisibility(isAi ? View.VISIBLE : View.GONE);
         TextView tvSource = findViewById(R.id.tvSource);
-        tvSource.setText((sourceText == null || sourceText.isEmpty())
-                ? getString(R.string.manual_entry_hint) : sourceText);
+        if (isAi) {
+            tvSource.setText((sourceText == null || sourceText.isEmpty())
+                    ? getString(R.string.manual_entry_hint) : sourceText);
+        }
 
         EditText etTitle = findViewById(R.id.etTitle);
         EditText etDate = findViewById(R.id.etDate);
