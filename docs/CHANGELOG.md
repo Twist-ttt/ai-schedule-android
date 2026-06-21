@@ -272,6 +272,42 @@
 
 ---
 
+## 阶段 7｜看板与卡片体验优化
+
+> 来源：评审反馈四条——① 看板顶部「今日摘要」；② 日程卡片突出时间；③ 保存成功明确反馈；④ 统一圆角/间距/尺寸设计令牌。
+
+### `feat(ui): 设计令牌统一(dimens.xml) + 日程卡片改时间锚点布局`
+
+- **① 做了什么**：
+  - 新建 `res/values/dimens.xml`：圆角（卡片 20dp / 输入 16dp / 按钮 24dp）、间距（页面边距 20dp / 区块 16dp / 卡片间距 12dp）、尺寸（卡片内边距 16dp / 按钮最小高 52dp）统一收口为设计令牌。
+  - `bg_glass_card`（30dp→20dp）、`bg_glass_input`（20dp→16dp）的 `<corners>` 改引用 `@dimen/corner_*`；`styles.xml` 按钮 `cornerRadius`（26dp→24dp）与 `minHeight` 改引用令牌。全 App 卡片/输入/按钮圆角从此一致。
+  - 日程卡片 `item_event.xml` 重构：信息优先级 **时间 > 标题 > 地点 > 提醒**——左侧强调色条 + `HH:mm` 大字（强调色）作视觉锚点，右侧标题（主）+「地点 · 提前N分钟提醒」复合副行（次）。`EventAdapter` 相应改：`tvTime` 仅显时分、新增 `tvMeta` 合并地点与提醒（无提醒则省略）。
+- **② AI 提示词与修改**：见 `prompts.md` 第 19 轮。要点：卡片由"四字段平均堆叠"改为"时间锚点 + 复合副行"，提升扫读效率；设计令牌以 `@dimen` 引用进 drawable（AAPT2 支持）。
+- **③ 问题与解决**：`<corners android:radius>` 引用 `@dimen` 需 AAPT2 解析（现代 AGP 支持）；`bg_glass_card` 是 layer-list，两层 shape 的圆角必须同时改否则高光层与主体圆角不匹配——两层都引用同一令牌。
+- **验证**：本机无法编译，需 AS **Sync + Run**；重点确认：① 全 App 卡片圆角统一为 20dp、无圆角错位；② 日程卡片左侧大字时间 + 右侧标题/地点·提醒；③ 地点为空时显"未设置地点"、无提醒时副行省略提醒段。
+
+### `feat(ui): 看板页今日摘要（数量 + 最近一项）`
+
+- **① 做了什么**：
+  - `activity_schedule_list.xml` 日历与列表之间插入「今日摘要」玻璃面板（`tvSummaryCount` + `tvSummaryNext`）；页面左右边距改 `@dimen/spacing_page_h`(20dp)。
+  - `ScheduleListActivity.updateSummary()`：选中日为今天时显「今天有 N 个日程 / 今天还没有日程」；今天且有未开始日程时副行显「最近：HH:mm 标题 · 地点」（按 startTime 升序找首个 ≥ now）。非今天只显「当日有 N 个日程 / 该日暂无日程」。
+  - `strings.xml` 加 5 条摘要文案（`summary_today_count` 等，含 `%1$d` 数量占位）。
+- **② AI 提示词与修改**：见 `prompts.md` 第 19 轮。要点：摘要只对"今天"显示"最近一项"（其他日期该语感不成立）；dayList 已按 startTime 升序，首个 ≥ now 即最近未开始。
+- **③ 问题与解决**：跨天选 0 点比较用 `selectedDayStart == DateUtils.todayStart()`（long 基本类型 == 安全）。
+- **验证**：需 AS Run；重点确认：① 今天有多条日程时显数量 + 最近一条；② 全部已过时只显数量（副行隐藏）；③ 切到其他日期副行隐藏、数量行文案变"当日…"。
+
+### `feat(ui): 保存成功反馈对话框（提醒/未提醒/已过 三态）`
+
+- **① 做了什么**：
+  - `AiConfirmActivity` 保存后由裸 Toast 改为 `MaterialAlertDialogBuilder` 对话框：标题「日程已创建」，正文三态——已设提醒「将在开始前 N 分钟提醒你」/ 未设「未设置提醒」/ 提醒时间已过「提醒时间已过，本次不会提醒」；按钮「查看日程」点击跳看板页。
+  - 提醒是否生效以"实际是否 schedule"为准（`willRemind = reminder>0 && trigger>now`），与 `ReminderScheduler` 实际行为一致。
+  - `strings.xml` 加 5 条对话框文案（含 `%1$d` 分钟占位）。
+- **② AI 提示词与修改**：见 `prompts.md` 第 19 轮。要点：反馈需明确"提醒已就绪"的安全感；三态覆盖「设了/没设/设了但已过」全部情形。
+- **③ 问题与解决**：`willRemind` 在后台线程算好后 `final` 传回主线程弹框；`setCancelable(false)` 防误退丢失反馈。
+- **验证**：需 AS Run；重点确认：① 设提醒且未来时间→「将在开始前N分钟提醒你」；② 提醒填0→「未设置提醒」；③ 日程时间已过但填了提醒→「提醒时间已过…」；④ 点「查看日程」进看板且新日程可见。
+
+---
+
 ## 文档修订
 
 ### `docs: 设计文档首页按钮文案与代码对齐`

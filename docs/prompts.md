@@ -244,6 +244,18 @@
   - Android 13+ 在 MainActivity 请求 POST_NOTIFICATIONS。
   - **验证**：临时导出 Receiver 用 `am broadcast` 触发，`AlarmReceiver→Notifier→通知` 成功发出（dumpsys 可见 `schedule_reminder` 通道、importance HIGH）；随后还原 `exported=false`。
 
+### 第 19 轮（阶段 7）：看板与卡片体验优化（评审反馈四条）
+
+- **提示词原文**：评审给出四条 UI/UX 建议——① 看板页顶部加「今日摘要」（如"今天有 3 个日程 / 最近：15:00 组会 · 图书馆"）；② 日程卡片要突出时间（时间>标题>地点>提醒，时间左侧做视觉锚点）；③ 保存成功后给明确反馈（"日程已创建 / 将在开始前15分钟提醒你"或"未设置提醒"），而非裸跳转；④ 统一圆角、阴影、间距设计规范（页面边距/卡片圆角/输入框圆角/按钮圆角/卡片间距/按钮高度），写进设计文档体现设计系统意识。
+- **AI 生成结果与我的修改**：
+  - 设计令牌：新建 `dimens.xml` 收口圆角(卡20/输入16/按钮24)、间距(页20/区块16/卡间12)、尺寸(卡内边16/按钮高52)；drawable 与 styles 改引用 `@dimen/*`。**自检**：`bg_glass_card` 是 layer-list，两层 shape 圆角必须同改（否则高光层圆角与主体不匹配），两层都引同一令牌。
+  - 日程卡片：由"四字段纵向堆叠"重构为"左侧 HH:mm 大字锚点 + 右侧标题 + 地点·提醒复合副行"；`EventAdapter` 新增 `buildMeta()` 合并地点与提醒（无提醒省略）。**自检**：旧 `tvLocation/tvReminder` 全局 grep 确认无悬空引用。
+  - 今日摘要：看板日历与列表间加摘要玻璃面板；`updateSummary()` 对"今天"显示数量+最近未开始一项，其他日期只显数量。**自检**：dayList 已按 startTime 升序（CP query `ORDER BY startTime ASC`），首个 ≥ now 即最近。
+  - 保存反馈：裸 Toast 改 `MaterialAlertDialogBuilder` 三态弹框；`willRemind` 以后台实际 schedule 结果为准（与 ReminderScheduler 行为一致），`final` 传回主线程。
+- **验证**：本机无法编译，需 AS Sync + Run；验证点见 CHANGELOG 阶段 7 各条。
+
+---
+
 ## 调试错误
 
 （开发过程中遇到编译/运行错误时，在此记录提示词与解决办法。）
