@@ -256,6 +256,19 @@
 
 ---
 
+### 第 20 轮（阶段 8）：首页统一自然语言入口（修改/删除）
+
+- **提示词原文**：用户要求"在首页输入文字可以修改日程"，并就实现方式做了两轮设计评审。最终决策：① 单按钮自动判断 create/edit/delete；② 多匹配弹候选列表点选；③ 范围含改字段 + 自然语言删除。
+- **AI 生成结果与我的修改**：
+  - 经两轮评审从 v1（`targetTitle` + 复用 `ParsedSchedule`）迭代到 v3：`TargetSpec`（标题/日期/时间/时段/地点，硬过滤+软打分）+ `SchedulePatch`（含 `timeShiftMinutes` 相对平移）。
+  - 关键设计：LLM **不返回 eventId**，只给匹配条件，客户端在真实库匹配——规避幻觉。多匹配走真实候选列表（`CandidatePickerActivity`），不二次匹配（传 candidateIds）。
+  - `MODE_EDIT` 先读原始 EventRecord 再 patch，保 endTime/sourceText/status 与原时长（≤0 兜底 1 小时）；`reminderMinutes` Gson 兜底 −1 防缺字段被反序列化成 0 误取消提醒。
+  - `EventMatcher` 用"硬过滤+软打分"而非全 AND：避免 LLM 猜偏一个具体时间（如 15:00 而实际 15:30）导致 0 命中——time 只排序不排除。
+  - 分 4 阶段提交：edit 单匹配 / delete 单匹配 / 候选页 / 留痕+清理。
+- **验证**：本机无法编译，AS Sync+Run；验证点见 CHANGELOG 阶段 8。
+
+---
+
 ## 调试错误
 
 （开发过程中遇到编译/运行错误时，在此记录提示词与解决办法。）

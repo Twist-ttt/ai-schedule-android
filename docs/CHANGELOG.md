@@ -308,6 +308,40 @@
 
 ---
 
+## 阶段 8｜首页统一自然语言入口（修改/删除）
+
+> 把首页升级为统一自然语言命令入口：同一句话，AI 自动判断 create/edit/delete/clarify。
+> 设计核心：LLM 只输出匹配条件(TargetSpec)+改动量(SchedulePatch)，**不返回事件 id**，客户端在真实库匹配——零幻觉、零误改。
+> 经两轮设计评审迭代（v1→v2→v3）定稿，计划见 plan 文件。
+
+### `feat(nl): edit 单匹配（阶段1）`
+
+- **① 做了什么**：
+  - `network/` 新增 `ParsedCommand`/`TargetSpec`/`SchedulePatch` 三模型；`util/EventMatcher`（**硬过滤** title/date + **软打分** time/timePeriod/location，软条件只排序不排除，避免 LLM 猜偏时间 0 命中）；`util/SchedulePatcher`（支持 `timeShiftMinutes` 相对平移、自动跨天）。
+  - `EventDao.getAllSync` + `Repository.getEventsAllSync`/`completeHistory`；`LlmClient.interpret`（注入日程列表作上下文，统一意图解析 + ParseHistory 留痕）；`MainActivity` 意图分支；`AiConfirmActivity` 加 `MODE_EDIT`（**先读原始 EventRecord 再 patch**，保留 endTime/sourceText/status，改开始时间保时长）。
+  - `reminderMinutes` Gson 兜底 −1（防缺字段被反序列化成 0 误取消提醒）。
+- **② AI 提示词与修改**：见 `prompts.md` 第 20 轮。两轮评审把 v1 的 `targetTitle + 复用 ParsedSchedule` 迭代为 TargetSpec + SchedulePatch + timeShiftMinutes。
+- **③ 问题与解决**：见计划 v3「取舍」。关键：LLM 不返回 eventId（规避计数幻觉）；MODE_EDIT 不凭 Extras 重建对象（先读原始保字段）。
+- **验证**：本机无法编译，需 AS Sync+Run；"把组会改到下午4点，地点图书馆"→ MODE_EDIT 预填 → 保存更新、提醒重设、原 sourceText/时长保留。
+
+### `feat(nl): delete 单匹配 + 强确认（阶段2）`
+
+- **① 做了什么**：`MainActivity` INTENT_DELETE 分支：匹配 → 单条弹删除确认对话框（**标题+时间+地点**+「此操作不可撤销」）→ `ReminderScheduler.cancel` + `repo.deleteEvent`。
+- **②/③**：见 `prompts.md` 第 20 轮。顺带在自然语言路径落实设计评审 P0「删除无确认」（详情页按钮删除的 P0 仍待单独修）。
+- **验证**："删掉明天的英语练习"→ 确认框 → 确认 → 看板消失、提醒取消。
+
+### `feat(nl): 多匹配候选选择页（阶段3）`
+
+- **① 做了什么**：`util/ScheduleActions.confirmDelete` 抽出（MainActivity 传 null / Picker 传 finish 复用）；新增 `CandidatePickerActivity` + 布局：入参 `candidateIds`(long[], **不二次匹配**) + `pickerMode` + `patchJson`(JSON 字符串，免 Parcelable)；复用 `EventAdapter` 展示；edit→`SchedulePatcher.apply`→MODE_EDIT，delete→强确认→删除。Manifest 注册。
+- **验证**：两条"会议"→ "把会议推迟1小时" → 候选列表 → 选一条 → 只改/删选中那条。
+
+### `chore(nl): 留痕增强 + 清理死代码（阶段4）`
+
+- **① 做了什么**：`LlmClient.interpret` 的 jsonResult 包成 `{raw, intent, target}`，便于解析历史页回看"这句话被理解成什么意图、要操作哪个目标"；清理被 `interpret` 取代的旧 `parse()` 链路（Callback/SYSTEM_PROMPT/buildBody/parseSchedule(String)/postSuccess/postError），LlmClient 只剩统一入口。
+- **验证**：每次自然语言命令在解析历史页留痕（含 intent/target）；create/edit/delete 落地后 isApplied=true。
+
+---
+
 ## 文档修订
 
 ### `docs: 设计文档首页按钮文案与代码对齐`

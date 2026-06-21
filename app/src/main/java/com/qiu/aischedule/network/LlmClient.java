@@ -28,10 +28,12 @@ import okhttp3.Response;
 
 /**
  * LLM 网络客户端：调用 OpenAI 兼容的 /chat/completions 接口（默认 DeepSeek）。
- * - 请求经 OkHttp 异步执行，**不在主线程**；
- * - 用 Gson 构造请求体与解析响应；
- * - 解析后写入 ParseHistory（AI 辅助过程留痕），再通过主线程回调通知 UI；
- * - 无 API Key / 网络失败时回调 onError，UI 降级为手动填写。
+ * 统一自然语言入口 {@link #interpret}：把日程列表作上下文，让 LLM 判断 create/edit/delete/clarify。
+ * - 请求经 OkHttp 异步执行，**不在主线程**（读配置/Key、发请求、写历史都在后台）；
+ * - 用 Gson 构造请求体与解析响应；解析后写入 ParseHistory（AI 辅助过程留痕）；
+ * - 无 Key / 网络失败回调 onError，UI 降级提示（永不死胡同）。
+ * 设计：LLM 只输出匹配条件（TargetSpec）与改动量（SchedulePatch），<b>不返回 eventId</b>，
+ * 目标由客户端在真实库匹配——规避幻觉、误改。
  */
 public class LlmClient {
 
@@ -57,79 +59,6 @@ public class LlmClient {
         return INSTANCE;
     }
 
-    public interface Callback {
-        void onSuccess(ParsedSchedule parsed, long historyId, String rawJson);
-
-        void onError(String message);
-    }
-
-    private static final String SYSTEM_PROMPT =
-            "你是日程解析助手。把用户输入解析为 JSON，只输出 JSON 对象，不要任何解释或代码块标记。" +
-                    "字段：title(字符串)、date(yyyy-MM-dd)、time(HH:mm)、location(字符串)、" +
-                    "reminderMinutes(整数,0表示不提醒)、needClarification(布尔)、question(字符串)。" +
-                    "若时间或关键信息不明确，请设 needClarification=true 并在 question 中说明要追问什么；否则 needClarification=false。" +
-                    "今天的日期是 {today}。";
-
-    public void parse(Context context, String userInput, Callback callback) {
-        // 整体放在后台线程：读配置(Key 来自 EncryptedSharedPreferences)、发请求、写历史都在非主线程
-        AppExecutors.getInstance().diskIO().execute(() -> {
-            ScheduleRepository repo = ScheduleRepository.getInstance(context);
-            ApiConfig cfg = repo.getApiConfigSync();
-            String key = SecretStore.getApiKey(context);
-
-            if (cfg == null || key == null || key.isEmpty()) {
-                postError(callback, context.getString(R.string.toast_no_apikey));
-                return;
-            }
-
-            String model = notEmpty(cfg.modelName) ? cfg.modelName : "deepseek-chat";
-            String baseUrl = notEmpty(cfg.baseUrl) ? cfg.baseUrl : "https://api.deepseek.com";
-            String url = baseUrl.endsWith("/") ? baseUrl + "chat/completions" : baseUrl + "/chat/completions";
-
-            String body = buildBody(model, userInput);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .header("Authorization", "Bearer " + key)
-                    .post(RequestBody.create(body, MediaType.get("application/json; charset=utf-8")))
-                    .build();
-
-            client.newCall(request).enqueue(new okhttp3.Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    postError(callback, "网络失败：" + e.getMessage());
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    String respBody = response.body() != null ? response.body().string() : "";
-                    if (!response.isSuccessful()) {
-                        postError(callback, "接口返回 " + response.code());
-                        return;
-                    }
-                    try {
-                        String content = extractContent(respBody);
-                        ParsedSchedule parsed = parseSchedule(content);
-
-                        ParseHistory history = new ParseHistory();
-                        history.inputText = userInput;
-                        history.modelName = model;
-                        history.jsonResult = content;
-                        history.confidence = parsed.needClarification ? 0.3f : 0.9f;
-                        history.createdAt = System.currentTimeMillis();
-                        history.isApplied = false;
-                        long historyId = repo.insertHistorySync(history);
-
-                        postSuccess(callback, parsed, historyId, content);
-                    } catch (Exception ex) {
-                        postError(callback, "解析失败：" + ex.getMessage());
-                    }
-                }
-            });
-        });
-    }
-
-    // ====================== 统一意图解析（create / edit / delete）======================
-
     public interface CommandCallback {
         void onSuccess(ParsedCommand command, long historyId);
 
@@ -152,8 +81,7 @@ public class LlmClient {
 
     /**
      * 统一自然语言入口：把日程列表作上下文喂给 LLM，判断 create/edit/delete/clarify。
-     * 整体在后台线程：读配置/Key、发请求、写 ParseHistory（isApplied=false）都不在主线程。
-     * 无 Key / 网络失败回调 onError，UI 降级提示。
+     * 整体在后台线程；无 Key / 网络失败回调 onError。
      */
     public void interpret(Context context, String userInput, List<EventRecord> events, CommandCallback callback) {
         AppExecutors.getInstance().diskIO().execute(() -> {
@@ -197,7 +125,7 @@ public class LlmClient {
                         ParseHistory history = new ParseHistory();
                         history.inputText = userInput;
                         history.modelName = model;
-                        history.jsonResult = content;
+                        history.jsonResult = wrapHistoryJson(content, cmd); // 留痕：raw + intent + target
                         history.confidence = cmd.needClarification ? 0.3f : 0.9f;
                         history.createdAt = System.currentTimeMillis();
                         history.isApplied = false;
@@ -330,6 +258,26 @@ public class LlmClient {
         return p;
     }
 
+    /**
+     * 留痕：把 AI 原始输出与解析出的 intent/target 一并存进 jsonResult，
+     * 便于在解析历史页回看"这句话被理解成什么意图、要操作哪个目标"。
+     */
+    private String wrapHistoryJson(String rawContent, ParsedCommand cmd) {
+        JsonObject o = new JsonObject();
+        o.addProperty("raw", rawContent);
+        o.addProperty("intent", cmd.intent);
+        if (cmd.target != null) {
+            JsonObject t = new JsonObject();
+            t.addProperty("titleKeyword", cmd.target.titleKeyword);
+            t.addProperty("date", cmd.target.date);
+            t.addProperty("time", cmd.target.time);
+            t.addProperty("timePeriod", cmd.target.timePeriod);
+            t.addProperty("locationKeyword", cmd.target.locationKeyword);
+            o.add("target", t);
+        }
+        return o.toString();
+    }
+
     private void postCmdSuccess(CommandCallback cb, ParsedCommand cmd, long historyId) {
         AppExecutors.getInstance().mainThread().execute(() -> cb.onSuccess(cmd, historyId));
     }
@@ -338,50 +286,11 @@ public class LlmClient {
         AppExecutors.getInstance().mainThread().execute(() -> cb.onError(msg));
     }
 
-    private String buildBody(String model, String userInput) {
-        JsonObject root = new JsonObject();
-        root.addProperty("model", model);
-
-        JsonArray messages = new JsonArray();
-        JsonObject sys = new JsonObject();
-        sys.addProperty("role", "system");
-        sys.addProperty("content", SYSTEM_PROMPT.replace("{today}", DateUtils.formatDate(System.currentTimeMillis())));
-        messages.add(sys);
-
-        JsonObject user = new JsonObject();
-        user.addProperty("role", "user");
-        user.addProperty("content", userInput);
-        messages.add(user);
-
-        root.add("messages", messages);
-        root.addProperty("temperature", 0);
-        return root.toString();
-    }
-
     /** 从 OpenAI 兼容响应中取 choices[0].message.content。 */
     private String extractContent(String respBody) {
         JsonObject resp = JsonParser.parseString(respBody).getAsJsonObject();
         return resp.getAsJsonArray("choices").get(0).getAsJsonObject()
                 .getAsJsonObject("message").get("content").getAsString();
-    }
-
-    /** 从模型输出中抽取首个 JSON 对象并解析为 ParsedSchedule（兼容代码块/多余文字）。 */
-    private ParsedSchedule parseSchedule(String content) {
-        int s = content.indexOf('{');
-        int e = content.lastIndexOf('}');
-        if (s < 0 || e < 0 || e < s) {
-            throw new RuntimeException("未找到 JSON");
-        }
-        JsonObject o = JsonParser.parseString(content.substring(s, e + 1)).getAsJsonObject();
-        ParsedSchedule p = new ParsedSchedule();
-        p.title = optStr(o, "title");
-        p.date = optStr(o, "date");
-        p.time = optStr(o, "time");
-        p.location = optStr(o, "location");
-        p.reminderMinutes = optInt(o, "reminderMinutes");
-        p.needClarification = optBool(o, "needClarification");
-        p.question = optStr(o, "question");
-        return p;
     }
 
     private static String optStr(JsonObject o, String k) {
@@ -411,14 +320,6 @@ public class LlmClient {
             return "true".equalsIgnoreCase(p.getAsString().trim());
         }
         return false;
-    }
-
-    private void postSuccess(Callback cb, ParsedSchedule p, long historyId, String rawJson) {
-        AppExecutors.getInstance().mainThread().execute(() -> cb.onSuccess(p, historyId, rawJson));
-    }
-
-    private void postError(Callback cb, String msg) {
-        AppExecutors.getInstance().mainThread().execute(() -> cb.onError(msg));
     }
 
     private static boolean notEmpty(String s) {
