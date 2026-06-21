@@ -47,6 +47,12 @@
     <string name="toast_delete_pending">自然语言删除将在下个版本支持，暂请进入「我的日程」手动删除</string>
     <string name="toast_multi_pending">找到多个相关日程，请用更具体的描述（如日期、地点）</string>
 
+    <!-- 自然语言删除·强确认对话框 -->
+    <string name="dialog_delete_confirm_title">删除日程</string>
+    <string name="dialog_delete_confirm_msg">「%1$s」\n时间：%2$s\n地点：%3$s\n\n此操作不可撤销</string>
+    <string name="dialog_delete_ok">删除</string>
+    <string name="dialog_delete_cancel">取消</string>
+
     <!-- 详情页 -->
     <string name="detail_title">日程详情</string>
 

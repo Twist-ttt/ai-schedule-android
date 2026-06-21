@@ -17,6 +17,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.qiu.aischedule.R;
 import com.qiu.aischedule.data.local.entity.EventRecord;
 import com.qiu.aischedule.data.repository.ScheduleRepository;
@@ -117,8 +118,7 @@ public class MainActivity extends BaseActivity {
                 handleEdit(cmd, events, input, historyId);
                 break;
             case ParsedCommand.INTENT_DELETE:
-                // 阶段 2 实现：自然语言删除（含强确认）。当前引导用户手动删除。
-                Toast.makeText(this, R.string.toast_delete_pending, Toast.LENGTH_LONG).show();
+                handleDelete(cmd, events, historyId);
                 break;
             case ParsedCommand.INTENT_CREATE:
             default:
@@ -163,6 +163,46 @@ public class MainActivity extends BaseActivity {
             // 阶段 3 实现：多匹配弹候选列表。当前引导用户用更精确的描述。
             Toast.makeText(this, R.string.toast_multi_pending, Toast.LENGTH_LONG).show();
         }
+    }
+
+    /** delete：按 TargetSpec 匹配真实日程，单条强确认删除，多条进候选页（阶段3）。 */
+    private void handleDelete(ParsedCommand cmd, List<EventRecord> events, long historyId) {
+        if (cmd.target == null) {
+            Toast.makeText(this, R.string.toast_no_match, Toast.LENGTH_LONG).show();
+            return;
+        }
+        List<EventRecord> matches = EventMatcher.match(events, cmd.target);
+        if (matches.isEmpty()) {
+            Toast.makeText(this, getString(R.string.toast_no_match, cmd.target.titleKeyword), Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (matches.size() == 1) {
+            confirmAndDelete(matches.get(0), historyId);
+        } else {
+            // 阶段 3 实现：多匹配弹候选列表。当前引导用户用更精确的描述。
+            Toast.makeText(this, R.string.toast_multi_pending, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /** 删除强确认：显示标题+时间+地点，确认后取消提醒并删除。 */
+    private void confirmAndDelete(EventRecord e, long historyId) {
+        String time = DateUtils.formatDateTime(e.startTime);
+        String loc = (e.location == null || e.location.trim().isEmpty())
+                ? getString(R.string.event_no_location) : e.location;
+        String msg = getString(R.string.dialog_delete_confirm_msg, e.title, time, loc);
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.dialog_delete_confirm_title)
+                .setMessage(msg)
+                .setNegativeButton(R.string.dialog_delete_cancel, null)
+                .setPositiveButton(R.string.dialog_delete_ok, (d, w) -> {
+                    ReminderScheduler.cancel(this, e.id);
+                    ScheduleRepository.getInstance(this).deleteEvent(e);
+                    if (historyId != -1L) {
+                        ScheduleRepository.getInstance(this).markHistoryApplied(historyId, true);
+                    }
+                    Toast.makeText(this, R.string.toast_deleted, Toast.LENGTH_SHORT).show();
+                })
+                .show();
     }
 
     /** edit 单匹配：把合并字段预填进 MODE_EDIT 确认页。 */
