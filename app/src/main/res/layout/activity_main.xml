@@ -12,9 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@drawable/bg_appbar"
-        app:elevation="0dp"
-        app:title="@string/app_name"
-        app:titleTextColor="@color/glass_text_primary" />
+        app:elevation="0dp" />
+    <!-- 首页 Toolbar 不显示标题：品牌名已由下方 Hero 卡片承载，顶部留白更简洁（菜单仍挂在此 Toolbar） -->
 
     <LinearLayout
         android:layout_width="match_parent"
