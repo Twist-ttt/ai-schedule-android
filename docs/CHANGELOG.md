@@ -364,3 +364,19 @@
 - **② AI 提示词与修改**：见 `prompts.md`「收尾修复」。核对发现代码默认值与设计文档不一致，统一为 `deepseek-v4-flash`。
 - **③ 问题与解决**：两处默认值此前被改为 `deepseek-chat`（DeepSeek 通用 chat 模型名），与项目设定 `deepseek-v4-flash` 不符；本次统一。
 - **验证**：本机无法编译，需 AS Sync+Run；首次安装未配置时，设置页 model 字段回填 `deepseek-v4-flash`，发起解析请求默认走该 model。
+
+---
+
+## 收尾整理
+
+### `chore: 提交交付物 + 完善 .gitignore`
+
+- **① 做了什么**：
+  - 提交交付文档 `项目设计文档.docx`、`AI提示词使用记录.docx`（由 `md2docx.py` 从 `设计文档.md`/`prompts.md` 生成）。
+  - 提交生成工具 `md2docx.py`（md→docx，中文友好排版，便于复现交付物）。
+  - 提交视频脚本 `docs/视频脚本-开发介绍.md`、`docs/视频脚本-运行演示.md`（过程物）。
+  - `.gitignore` 重写：整体排除 `/.idea/`、忽略 Office 临时锁 `~$*` 与演示视频 `*.mp4`（视频走其他渠道交付）。
+  - 删除 Office 临时锁文件 `~$*.docx`。
+- **② AI 提示词与修改**：见 `prompts.md`「收尾整理」。
+- **③ 问题与解决**：确认 `.idea/` 仅 `.gitignore` 被跟踪，整体排除安全；`md2docx.py` 经核实为交付物生成工具而非测试脚本，予以保留；排查确认无 test 目录残留、无 `Log.d/v` 调试日志、无 TODO/FIXME（SecretStore 的 TEMP 按约定保留，测试 Key 已在 DeepSeek 注销）。
+- **验证**：`git status --short` 仅显示本次暂存文件，无 untracked 残留——工作区达到干净状态。

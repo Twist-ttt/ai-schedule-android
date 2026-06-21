@@ -294,3 +294,14 @@
 - **提示词原文**：「进入收尾」——核对 `LlmClient`/`SettingsActivity` 默认 model 与 CLAUDE.md 设计说明是否一致；同时检查 GitHub 上测试 API Key 是否仍可见。
 - **解决的问题**：两处默认 model 此前为 `deepseek-chat`，与项目设定的 `deepseek-v4-flash` 不一致；`ReminderScheduler` 有一处误操作的缩进改动。
 - **AI 生成结果与我的修改**：未直接采纳 AI 提交建议，先逐文件核对 diff——确认 model 改动合理后统一为 `deepseek-v4-flash`，**还原** `ReminderScheduler` 的无意义缩进改动，并同步 `项目开发现状.md`。另查明测试 Key（`sk-...`）已在历史 commit `27615dd` 泄露至 GitHub origin/main，结论：需到 DeepSeek 注销该 Key，而非仅靠不提交。
+
+## 收尾整理
+
+### 工作区清理与交付物入库
+
+- **提示词原文**：「docx提交，视频不提交。然后记得把一些什么测试脚本删掉，保证仓库是一个完美的状态」
+- **解决的问题**：收尾阶段把工作区整理到可交付的干净状态——哪些文件入库、哪些忽略、哪些删除。
+- **AI 生成结果与我的修改**：
+  - AI 先全面排查（test 目录、TODO/FIXME、`Log.d/v` 调试日志、`md2docx.py` 性质、异常文件名 `42434`），确认无测试残留代码；`md2docx.py` 经核实是交付 docx 的生成工具，保留并入库；`42434` 系 `ls` 输出误读，实际不存在。
+  - 决策：docx + `md2docx.py` + 视频脚本入库；mp4 视频不入库（走其他渠道）；`~$*.docx` 临时锁删除；`.idea/` 整体 gitignore。
+  - 一并处理安全问题：上一轮发现测试 Key 已泄露至 GitHub 历史（commit `27615dd`），本轮已在 DeepSeek 注销该 Key，明文 key 字符串虽仍在历史中但已失效。

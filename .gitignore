@@ -1,13 +1,17 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+
+# Android Studio / IntelliJ 工程本地配置（个人项目，整体排除）
+/.idea/
+
+# 系统/应用临时文件
 .DS_Store
+~$*
+
+# 演示视频不纳入提交（走其他渠道交付）
+*.mp4
+
 /build
 /app/build
 /captures
