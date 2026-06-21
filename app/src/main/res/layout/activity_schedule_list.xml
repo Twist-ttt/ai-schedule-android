@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 日程看板页：玻璃 Toolbar + 日历玻璃面板 + 事件列表 + 玻璃 FAB -->
+<!-- 日程看板页：玻璃 Toolbar + 日历玻璃面板 + 今日摘要 + 事件列表 + 玻璃 FAB -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -25,15 +25,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="16dp">
+            android:paddingStart="@dimen/spacing_page_h"
+            android:paddingEnd="@dimen/spacing_page_h"
+            android:paddingBottom="@dimen/spacing_page_h">
 
             <LinearLayout
                 style="@style/Widget.MyApp.GlassContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/spacing_card_gap"
                 android:padding="6dp">
 
                 <CalendarView
@@ -43,11 +43,39 @@
                     android:background="@android:color/transparent" />
             </LinearLayout>
 
+            <!-- 今日摘要：选中日的数量 + 最近一项（助手化信息层） -->
+            <LinearLayout
+                android:id="@+id/summaryBlock"
+                style="@style/Widget.MyApp.GlassContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_card_gap"
+                android:orientation="vertical"
+                android:padding="@dimen/card_padding">
+
+                <TextView
+                    android:id="@+id/tvSummaryCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSummaryNext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/glass_accent_teal"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:layout_marginTop="12dp">
+                android:layout_marginTop="@dimen/spacing_card_gap">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvEvents"

@@ -35,6 +35,8 @@ import java.util.List;
  * 阶段 3：数据通过 **ContentProvider** 读取——用 ContentResolver.query 经 URI 获取 Cursor，
  * 再映射为 EventRecord。注册 ContentObserver：Repository 写入并 notifyChange 后自动重新查询刷新。
  * 这样既满足"ContentProvider 通过 URI 访问数据"，又保留"修改/删除后界面刷新"。
+ *
+ * 顶部「今日摘要」：选中日的日程数量 + 最近一项未开始日程（仅今天显示副行），让看板更有"日程助手"语感。
  */
 public class ScheduleListActivity extends BaseActivity {
 
@@ -43,6 +45,8 @@ public class ScheduleListActivity extends BaseActivity {
 
     private EventAdapter adapter;
     private TextView tvEmpty;
+    private TextView tvSummaryCount;
+    private TextView tvSummaryNext;
     private ContentObserver observer;
 
     @Override
@@ -67,6 +71,8 @@ public class ScheduleListActivity extends BaseActivity {
         rv.setAdapter(adapter);
 
         tvEmpty = findViewById(R.id.tvEmpty);
+        tvSummaryCount = findViewById(R.id.tvSummaryCount);
+        tvSummaryNext = findViewById(R.id.tvSummaryNext);
 
         CalendarView calendarView = findViewById(R.id.calendarView);
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
@@ -184,5 +190,38 @@ public class ScheduleListActivity extends BaseActivity {
         }
         adapter.submitList(dayList);
         tvEmpty.setVisibility(dayList.isEmpty() ? View.VISIBLE : View.GONE);
+        updateSummary(dayList);
+    }
+
+    /** 今日摘要：数量行 + 最近一项（仅今天且有未开始日程时显示副行）。 */
+    private void updateSummary(List<EventRecord> dayList) {
+        boolean isToday = selectedDayStart == DateUtils.todayStart();
+        int count = dayList.size();
+
+        if (count == 0) {
+            tvSummaryCount.setText(isToday ? R.string.summary_today_none : R.string.summary_day_none);
+        } else {
+            tvSummaryCount.setText(getString(isToday
+                    ? R.string.summary_today_count : R.string.summary_day_count, count));
+        }
+
+        tvSummaryNext.setVisibility(View.GONE);
+        if (isToday && count > 0) {
+            long now = System.currentTimeMillis();
+            for (EventRecord e : dayList) {   // 已按 startTime 升序
+                if (e.startTime >= now) {
+                    String next = getString(R.string.summary_next_prefix)
+                            + DateUtils.formatTime(e.startTime) + ' ' + e.title
+                            + (isEmpty(e.location) ? "" : "  ·  " + e.location);
+                    tvSummaryNext.setText(next);
+                    tvSummaryNext.setVisibility(View.VISIBLE);
+                    break;
+                }
+            }
+        }
+    }
+
+    private boolean isEmpty(String s) {
+        return s == null || s.trim().isEmpty();
     }
 }

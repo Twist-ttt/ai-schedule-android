@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.qiu.aischedule.R;
 import com.qiu.aischedule.data.local.entity.EventRecord;
 import com.qiu.aischedule.data.repository.ScheduleRepository;
@@ -20,7 +21,8 @@ import com.qiu.aischedule.util.DateUtils;
  * AI 确认页。
  * - 由「AI 解析」进入：字段被自动回填（携带 historyId，保存时标记历史为已应用）；
  * - 由「手动填写」进入：字段可手动编辑（降级路径）。
- * 保存：后台线程写入数据库；若 reminderMinutes>0 且提醒时间在未来，则用 AlarmManager 设置提醒。
+ * 保存：后台线程写入数据库；若 reminderMinutes>0 且提醒时间在未来，则用 AlarmManager 设置提醒；
+ * 保存后弹反馈对话框（明确告知是否已设提醒），点击「查看日程」进看板页。
  */
 public class AiConfirmActivity extends BaseActivity {
 
@@ -134,22 +136,43 @@ public class AiConfirmActivity extends BaseActivity {
             // 后台线程：写入 DB + 设置提醒
             AppExecutors.getInstance().diskIO().execute(() -> {
                 long newId = repo.insertEventSync(event);
+                boolean willRemind = false;
                 if (reminder > 0) {
                     long trigger = start - reminder * 60000L;
                     if (trigger > System.currentTimeMillis()) {
                         ReminderScheduler.schedule(getApplicationContext(), newId, trigger);
+                        willRemind = true;
                     }
                 }
                 if (historyId != -1L) {
                     repo.markHistoryApplied(historyId, true);
                 }
-                runOnUiThread(() -> {
-                    Toast.makeText(this, R.string.toast_saved, Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(this, ScheduleListActivity.class));
-                    finish();
-                });
+                final boolean reminded = willRemind;
+                final int remindMin = reminder;
+                runOnUiThread(() -> showSavedDialog(reminded, remindMin));
             });
         });
+    }
+
+    /** 保存成功反馈：明确告知是否已设置提醒，再跳看板页（取代裸 Toast）。 */
+    private void showSavedDialog(boolean willRemind, int reminderMinutes) {
+        String msg;
+        if (willRemind) {
+            msg = getString(R.string.dialog_saved_reminder_set, reminderMinutes);
+        } else if (reminderMinutes > 0) {
+            msg = getString(R.string.dialog_saved_reminder_passed);
+        } else {
+            msg = getString(R.string.dialog_saved_no_reminder);
+        }
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.dialog_saved_title)
+                .setMessage(msg)
+                .setCancelable(false)
+                .setPositiveButton(R.string.dialog_saved_ok, (d, w) -> {
+                    startActivity(new Intent(this, ScheduleListActivity.class));
+                    finish();
+                })
+                .show();
     }
 
     /** 弹出日期选择器；选中后更新 dateMillis 并刷新显示。 */

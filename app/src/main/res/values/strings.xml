@@ -30,6 +30,13 @@
     <string name="empty_schedule">当天暂无日程</string>
     <string name="action_add">新增日程</string>
 
+    <!-- 看板页·今日摘要 -->
+    <string name="summary_today_count">今天有 %1$d 个日程</string>
+    <string name="summary_day_count">当日有 %1$d 个日程</string>
+    <string name="summary_today_none">今天还没有日程</string>
+    <string name="summary_day_none">该日暂无日程</string>
+    <string name="summary_next_prefix">最近：</string>
+
     <!-- 详情页 -->
     <string name="detail_title">日程详情</string>
 
@@ -73,6 +80,13 @@
     <string name="notif_test_title">测试提醒</string>
     <string name="notif_test_text">这是 AlarmManager 定时 + Notification 的提醒测试</string>
     <string name="toast_test_scheduled">5 秒后将弹出测试通知</string>
+
+    <!-- 保存反馈对话框 -->
+    <string name="dialog_saved_title">日程已创建</string>
+    <string name="dialog_saved_reminder_set">将在开始前 %1$d 分钟提醒你</string>
+    <string name="dialog_saved_no_reminder">未设置提醒</string>
+    <string name="dialog_saved_reminder_passed">提醒时间已过，本次不会提醒</string>
+    <string name="dialog_saved_ok">查看日程</string>
 
     <!-- Toast -->
     <string name="toast_saved">已保存日程</string>
