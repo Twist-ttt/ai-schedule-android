@@ -11,9 +11,9 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@drawable/bg_appbar"
+        android:background="@android:color/transparent"
         app:elevation="0dp" />
-    <!-- 首页 Toolbar 不显示标题：品牌名已由下方 Hero 卡片承载，顶部留白更简洁（菜单仍挂在此 Toolbar） -->
+    <!-- 首页 Toolbar：无标题 + 背景全透明，仅作右上角 overflow 菜单容器，视觉上隐于渐变背景 -->
 
     <LinearLayout
         android:layout_width="match_parent"
