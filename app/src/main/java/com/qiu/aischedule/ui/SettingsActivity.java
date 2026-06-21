@@ -25,6 +25,11 @@ public class SettingsActivity extends BaseActivity {
     private EditText etApiKey;
 
     @Override
+    protected boolean showUpNavigation() {
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);

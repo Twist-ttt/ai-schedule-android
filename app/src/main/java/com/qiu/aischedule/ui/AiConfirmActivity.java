@@ -48,6 +48,11 @@ public class AiConfirmActivity extends BaseActivity {
     private int minute;
 
     @Override
+    protected boolean showUpNavigation() {
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ai_confirm);

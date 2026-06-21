@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
@@ -62,11 +63,33 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (toolbar != null) {
             setSupportActionBar(toolbar);
         }
+        // 子页面在左上角显示返回箭头（点击由 onSupportNavigateUp 处理，结束当前页）
+        if (showUpNavigation()) {
+            ActionBar ab = getSupportActionBar();
+            if (ab != null) {
+                ab.setDisplayHomeAsUpEnabled(true);
+            }
+        }
         View root = findViewById(android.R.id.content);
         ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(v.getPaddingLeft(), bars.top, v.getPaddingRight(), bars.bottom);
             return insets;
         });
+    }
+
+    /**
+     * 子页面覆盖返回 true，在左上角显示返回箭头（点击结束当前页，回到来源页）。
+     * 首页（启动器 MainActivity）保持默认 false——它没有返回出口。
+     */
+    protected boolean showUpNavigation() {
+        return false;
+    }
+
+    /** 返回箭头：结束当前页回到来源页（finish 即可，各入口的回退栈都正确）。 */
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }

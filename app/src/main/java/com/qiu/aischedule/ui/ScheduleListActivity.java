@@ -46,6 +46,11 @@ public class ScheduleListActivity extends BaseActivity {
     private ContentObserver observer;
 
     @Override
+    protected boolean showUpNavigation() {
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_list);

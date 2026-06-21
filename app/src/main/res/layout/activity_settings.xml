@@ -13,7 +13,8 @@
         android:background="@drawable/bg_appbar"
         app:elevation="0dp"
         app:title="@string/settings_title"
-        app:titleTextColor="@color/glass_text_primary" />
+        app:titleTextColor="@color/glass_text_primary"
+        app:navigationIconTint="@color/glass_text_primary" />
 
     <ScrollView
         android:layout_width="match_parent"

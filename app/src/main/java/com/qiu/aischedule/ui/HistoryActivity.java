@@ -19,6 +19,11 @@ import com.qiu.aischedule.ui.adapter.HistoryAdapter;
 public class HistoryActivity extends BaseActivity {
 
     @Override
+    protected boolean showUpNavigation() {
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
