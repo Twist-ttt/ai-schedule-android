@@ -253,3 +253,11 @@
 - **现象/提示词**：`./gradlew assembleDebug` 报错 `对于 set(int,int,int,int,int,int,int), 找不到合适的方法`（ScheduleListActivity 选日处）。
 - **原因**：`java.util.Calendar` 没有 7 参数（含毫秒）的 `set` 重载，最长的只有 6 参数（到秒）。
 - **解决办法**：改为逐字段 `c.set(Calendar.YEAR, year)`… 并把 `Calendar.MILLISECOND` 单独置 0，确保"当天 0 点"毫秒归零（否则按日区间筛选会出错）。修复后 BUILD SUCCESSFUL。
+
+## 文档修订
+
+### 第 1 轮：设计文档首页按钮文案对齐
+
+- **提示词原文**：「修改文档」（用户要求修正设计文档与界面文案不一致处）。
+- **解决的问题**：`设计文档.md` 第 3 节写首页按钮为「AI 解析」/「解析·手动填写」/「我的日程」，但阶段 6（commit `7357636`）后实际次按钮文案已是「手动填写」，文档与界面不符。
+- **AI 生成结果与我的修改**：核对 `strings.xml`（`home_ai_parse=AI 解析`、`home_to_confirm=手动填写`、`home_to_schedule=我的日程`）确认实际文案后，把文档该行改为「AI 解析」/「手动填写」/「我的日程」，三处与界面一致。
