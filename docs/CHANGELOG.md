@@ -350,3 +350,17 @@
 - **② AI 提示词与修改**：见 `prompts.md`「文档修订」。用户核对作业要求时发现文档与界面文案不一致；核对 `strings.xml:8-10` 实际文案后修正。
 - **③ 问题与解决**：阶段 6（commit `7357636`）把首页次按钮语义从"解析+手动填写"改为纯"手动填写"（从零新建），设计文档未同步——本次补齐。纯文档修订，无编译影响。
 - **验证**：仅 1 行 markdown 改动，无需构建。
+
+---
+
+## 收尾修复
+
+### `fix(llm): 统一默认 model 为 deepseek-v4-flash`
+
+- **① 做了什么**：
+  - `LlmClient` 与 `SettingsActivity` 的默认 model 由 `deepseek-chat` 改回 `deepseek-v4-flash`，与 CLAUDE.md 设计说明一致。
+  - 同步更新 `docs/项目开发现状.md` §5.4 默认 model 描述。
+  - 顺带还原 `ReminderScheduler.java` 一处误操作的缩进改动（class 声明多缩进 4 空格，无功能意义）。
+- **② AI 提示词与修改**：见 `prompts.md`「收尾修复」。核对发现代码默认值与设计文档不一致，统一为 `deepseek-v4-flash`。
+- **③ 问题与解决**：两处默认值此前被改为 `deepseek-chat`（DeepSeek 通用 chat 模型名），与项目设定 `deepseek-v4-flash` 不符；本次统一。
+- **验证**：本机无法编译，需 AS Sync+Run；首次安装未配置时，设置页 model 字段回填 `deepseek-v4-flash`，发起解析请求默认走该 model。

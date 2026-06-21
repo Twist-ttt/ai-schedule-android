@@ -286,3 +286,11 @@
 - **提示词原文**：「修改文档」（用户要求修正设计文档与界面文案不一致处）。
 - **解决的问题**：`设计文档.md` 第 3 节写首页按钮为「AI 解析」/「解析·手动填写」/「我的日程」，但阶段 6（commit `7357636`）后实际次按钮文案已是「手动填写」，文档与界面不符。
 - **AI 生成结果与我的修改**：核对 `strings.xml`（`home_ai_parse=AI 解析`、`home_to_confirm=手动填写`、`home_to_schedule=我的日程`）确认实际文案后，把文档该行改为「AI 解析」/「手动填写」/「我的日程」，三处与界面一致。
+
+## 收尾修复
+
+### 统一默认 model 为 deepseek-v4-flash
+
+- **提示词原文**：「进入收尾」——核对 `LlmClient`/`SettingsActivity` 默认 model 与 CLAUDE.md 设计说明是否一致；同时检查 GitHub 上测试 API Key 是否仍可见。
+- **解决的问题**：两处默认 model 此前为 `deepseek-chat`，与项目设定的 `deepseek-v4-flash` 不一致；`ReminderScheduler` 有一处误操作的缩进改动。
+- **AI 生成结果与我的修改**：未直接采纳 AI 提交建议，先逐文件核对 diff——确认 model 改动合理后统一为 `deepseek-v4-flash`，**还原** `ReminderScheduler` 的无意义缩进改动，并同步 `项目开发现状.md`。另查明测试 Key（`sk-...`）已在历史 commit `27615dd` 泄露至 GitHub origin/main，结论：需到 DeepSeek 注销该 Key，而非仅靠不提交。

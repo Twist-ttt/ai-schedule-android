@@ -94,7 +94,7 @@ public class LlmClient {
                 return;
             }
 
-            String model = notEmpty(cfg.modelName) ? cfg.modelName : "deepseek-chat";
+            String model = notEmpty(cfg.modelName) ? cfg.modelName : "deepseek-v4-flash";
             String baseUrl = notEmpty(cfg.baseUrl) ? cfg.baseUrl : "https://api.deepseek.com";
             String url = baseUrl.endsWith("/") ? baseUrl + "chat/completions" : baseUrl + "/chat/completions";
 

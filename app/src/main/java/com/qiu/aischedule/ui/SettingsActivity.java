@@ -44,7 +44,7 @@ public class SettingsActivity extends BaseActivity {
         // 默认值（DeepSeek）
         etProvider.setText("deepseek");
         etBaseUrl.setText("https://api.deepseek.com");
-        etModel.setText("deepseek-chat");
+        etModel.setText("deepseek-v4-flash");
         etApiKey.setText(SecretStore.getApiKey(this));
 
         // 已有配置则覆盖回填
