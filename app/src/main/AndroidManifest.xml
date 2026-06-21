@@ -44,6 +44,11 @@
             android:name=".ui.SettingsActivity"
             android:label="@string/settings_title" />
 
+        <!-- 候选选择页：自然语言修改/删除命中多条时让用户点选目标 -->
+        <activity
+            android:name=".ui.CandidatePickerActivity"
+            android:label="@string/picker_title_edit" />
+
         <!-- 日程数据 ContentProvider：以 URI 暴露 events 表（exported=true 便于演示与 adb 验证） -->
         <provider
             android:name=".provider.ScheduleProvider"

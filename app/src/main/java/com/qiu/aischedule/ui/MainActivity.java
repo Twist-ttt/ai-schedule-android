@@ -17,17 +17,19 @@ import androidx.appcompat.app.ActionBar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.gson.Gson;
 import com.qiu.aischedule.R;
 import com.qiu.aischedule.data.local.entity.EventRecord;
 import com.qiu.aischedule.data.repository.ScheduleRepository;
 import com.qiu.aischedule.network.LlmClient;
 import com.qiu.aischedule.network.ParsedCommand;
 import com.qiu.aischedule.network.ParsedSchedule;
+import com.qiu.aischedule.network.SchedulePatch;
 import com.qiu.aischedule.notify.ReminderScheduler;
 import com.qiu.aischedule.util.AppExecutors;
 import com.qiu.aischedule.util.DateUtils;
 import com.qiu.aischedule.util.EventMatcher;
+import com.qiu.aischedule.util.ScheduleActions;
 import com.qiu.aischedule.util.SchedulePatcher;
 
 import java.util.List;
@@ -160,8 +162,7 @@ public class MainActivity extends BaseActivity {
             SchedulePatcher.MergedFields f = SchedulePatcher.apply(e, cmd.patch);
             startEdit(e.id, f, input, historyId);
         } else {
-            // 阶段 3 实现：多匹配弹候选列表。当前引导用户用更精确的描述。
-            Toast.makeText(this, R.string.toast_multi_pending, Toast.LENGTH_LONG).show();
+            startPicker(CandidatePickerActivity.MODE_EDIT, matches, cmd.patch, input, historyId);
         }
     }
 
@@ -177,32 +178,29 @@ public class MainActivity extends BaseActivity {
             return;
         }
         if (matches.size() == 1) {
-            confirmAndDelete(matches.get(0), historyId);
+            ScheduleActions.confirmDelete(this, matches.get(0), historyId, null);
         } else {
-            // 阶段 3 实现：多匹配弹候选列表。当前引导用户用更精确的描述。
-            Toast.makeText(this, R.string.toast_multi_pending, Toast.LENGTH_LONG).show();
+            startPicker(CandidatePickerActivity.MODE_DELETE, matches, null, null, historyId);
         }
     }
 
-    /** 删除强确认：显示标题+时间+地点，确认后取消提醒并删除。 */
-    private void confirmAndDelete(EventRecord e, long historyId) {
-        String time = DateUtils.formatDateTime(e.startTime);
-        String loc = (e.location == null || e.location.trim().isEmpty())
-                ? getString(R.string.event_no_location) : e.location;
-        String msg = getString(R.string.dialog_delete_confirm_msg, e.title, time, loc);
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.dialog_delete_confirm_title)
-                .setMessage(msg)
-                .setNegativeButton(R.string.dialog_delete_cancel, null)
-                .setPositiveButton(R.string.dialog_delete_ok, (d, w) -> {
-                    ReminderScheduler.cancel(this, e.id);
-                    ScheduleRepository.getInstance(this).deleteEvent(e);
-                    if (historyId != -1L) {
-                        ScheduleRepository.getInstance(this).markHistoryApplied(historyId, true);
-                    }
-                    Toast.makeText(this, R.string.toast_deleted, Toast.LENGTH_SHORT).show();
-                })
-                .show();
+    /** 多匹配：把候选 id 数组传给候选选择页（不二次匹配，沿用 EventMatcher 结果）。 */
+    private void startPicker(int pickerMode, List<EventRecord> matches, SchedulePatch patch, String input, long historyId) {
+        long[] ids = new long[matches.size()];
+        for (int i = 0; i < matches.size(); i++) {
+            ids[i] = matches.get(i).id;
+        }
+        Intent intent = new Intent(this, CandidatePickerActivity.class);
+        intent.putExtra(CandidatePickerActivity.EXTRA_CANDIDATE_IDS, ids);
+        intent.putExtra(CandidatePickerActivity.EXTRA_PICKER_MODE, pickerMode);
+        if (patch != null) {
+            intent.putExtra(CandidatePickerActivity.EXTRA_PATCH_JSON, new Gson().toJson(patch));
+        }
+        if (input != null) {
+            intent.putExtra(CandidatePickerActivity.EXTRA_SOURCE_TEXT, input);
+        }
+        intent.putExtra(CandidatePickerActivity.EXTRA_HISTORY_ID, historyId);
+        startActivity(intent);
     }
 
     /** edit 单匹配：把合并字段预填进 MODE_EDIT 确认页。 */
