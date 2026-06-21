@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -42,6 +43,13 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // 首页 Toolbar 不显示标题：品牌名已由 Hero 卡片承载。仅删布局的 app:title 不够——
+        // SupportActionBar 会回退到 manifest 默认 label（=app_name），故显式禁用标题显示。
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setDisplayShowTitleEnabled(false);
+        }
 
         etInput = findViewById(R.id.etInput);
         btnAiParse = findViewById(R.id.btnAiParse);
