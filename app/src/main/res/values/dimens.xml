@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ===== 设计令牌（Glassmorphism 设计系统）=====
+         全 App 的圆角、间距、尺寸统一收口于此，作为单一事实源；
+         styles.xml 与 drawable 引用同一组令牌，避免「每个卡片都不一样」。 -->
+
+    <!-- 圆角 -->
+    <dimen name="corner_card">20dp</dimen>      <!-- 玻璃卡片 / 面板 -->
+    <dimen name="corner_input">16dp</dimen>     <!-- 输入框 / 引用块 -->
+    <dimen name="corner_button">24dp</dimen>    <!-- 主 / 次按钮 -->
+
+    <!-- 间距 -->
+    <dimen name="spacing_page_h">20dp</dimen>        <!-- 页面左右边距 -->
+    <dimen name="spacing_section">16dp</dimen>       <!-- 区块纵向间距 -->
+    <dimen name="spacing_card_gap">12dp</dimen>      <!-- 卡片间距（合计） -->
+    <dimen name="spacing_card_gap_half">6dp</dimen>  <!-- 卡片单项上下边距（合 12dp） -->
+
+    <!-- 尺寸 -->
+    <dimen name="card_padding">16dp</dimen>      <!-- 卡片内边距 -->
+    <dimen name="height_button_min">52dp</dimen> <!-- 主按钮最小高度（≥48dp） -->
+</resources>

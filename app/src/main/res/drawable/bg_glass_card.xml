@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 玻璃面板：霜化填充 + 顶部高光（模拟玻璃光泽） + 亮白细描边 + 大圆角
-     用 layer-list 在纯资源层逼近毛玻璃质感（Android XML 无 backdrop blur，以"霜+顶光+描边"近似） -->
+     用 layer-list 在纯资源层逼近毛玻璃质感（Android XML 无 backdrop blur，以"霜+顶光+描边"近似）
+     圆角统一引用 @dimen/corner_card（设计令牌） -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 1. 主体：半透明白霜 + 纯白描边 + 大圆角 -->
     <item>
@@ -9,7 +10,7 @@
             <stroke
                 android:width="1dp"
                 android:color="@color/glass_card_stroke" />
-            <corners android:radius="30dp" />
+            <corners android:radius="@dimen/corner_card" />
         </shape>
     </item>
     <!-- 2. 顶部光泽：从顶部白渐隐到透明，营造玻璃顶光与立体感 -->
@@ -20,7 +21,7 @@
                 android:startColor="@color/glass_highlight_top"
                 android:endColor="@android:color/transparent"
                 android:type="linear" />
-            <corners android:radius="30dp" />
+            <corners android:radius="@dimen/corner_card" />
         </shape>
     </item>
 </layer-list>

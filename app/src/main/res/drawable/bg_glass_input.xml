@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 玻璃输入区：比面板更透（glass_input_fill），聚焦时描边加亮加粗（靛蓝 70%），强化反馈 -->
+<!-- 玻璃输入区：比面板更透（glass_input_fill），聚焦时描边加亮加粗（靛蓝 70%），强化反馈
+     圆角统一引用 @dimen/corner_input（设计令牌） -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_focused="true">
         <shape android:shape="rectangle">
@@ -7,7 +8,7 @@
             <stroke
                 android:width="1.5dp"
                 android:color="@color/glass_card_stroke_focused" />
-            <corners android:radius="20dp" />
+            <corners android:radius="@dimen/corner_input" />
         </shape>
     </item>
     <item>
@@ -16,7 +17,7 @@
             <stroke
                 android:width="1dp"
                 android:color="@color/glass_input_stroke" />
-            <corners android:radius="20dp" />
+            <corners android:radius="@dimen/corner_input" />
         </shape>
     </item>
 </selector>

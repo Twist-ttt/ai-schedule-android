@@ -17,7 +17,10 @@ import com.qiu.aischedule.util.DateUtils;
 
 /**
  * 日程列表 Adapter（看板页）。
- * 每项展示 标题 / 时间 / 地点 / 提醒 共 4 个字段（满足"列表项≥3 字段"）。
+ * 卡片信息优先级：时间 > 标题 > 地点 > 提醒。
+ *  - tvTime：左侧锚点，HH:mm 大字（强调色）；
+ *  - tvTitle：标题（主文本）；
+ *  - tvMeta：地点 · 提前N分钟提醒（复合副行，无提醒时只显地点）。
  * 使用 ListAdapter + DiffUtil，数据更新时自动做差异比较与刷新。
  */
 public class EventAdapter extends ListAdapter<EventRecord, EventAdapter.EventVH> {
@@ -64,12 +67,9 @@ public class EventAdapter extends ListAdapter<EventRecord, EventAdapter.EventVH>
         EventRecord e = getItem(position);
         Context ctx = holder.itemView.getContext();
 
+        holder.time.setText(DateUtils.formatTime(e.startTime));   // 左侧锚点：仅 HH:mm
         holder.title.setText(e.title);
-        holder.time.setText(DateUtils.formatDateTime(e.startTime));
-        holder.location.setText(isEmpty(e.location) ? ctx.getString(R.string.event_no_location) : e.location);
-        holder.reminder.setText(e.reminderMinutes > 0
-                ? (e.reminderMinutes + " " + ctx.getString(R.string.event_reminder_suffix))
-                : ctx.getString(R.string.event_no_reminder));
+        holder.meta.setText(buildMeta(ctx, e));
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
@@ -78,22 +78,32 @@ public class EventAdapter extends ListAdapter<EventRecord, EventAdapter.EventVH>
         });
     }
 
+    /** 复合副行：地点（无则占位） · 提前N分钟提醒（无提醒则省略）。 */
+    private String buildMeta(Context ctx, EventRecord e) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(isEmpty(e.location) ? ctx.getString(R.string.event_no_location) : e.location);
+        if (e.reminderMinutes > 0) {
+            sb.append("  ·  ")
+                    .append(e.reminderMinutes).append(' ')
+                    .append(ctx.getString(R.string.event_reminder_suffix));
+        }
+        return sb.toString();
+    }
+
     private boolean isEmpty(String s) {
         return s == null || s.trim().isEmpty();
     }
 
     static class EventVH extends RecyclerView.ViewHolder {
-        final TextView title;
         final TextView time;
-        final TextView location;
-        final TextView reminder;
+        final TextView title;
+        final TextView meta;
 
         EventVH(@NonNull View v) {
             super(v);
-            title = v.findViewById(R.id.tvTitle);
             time = v.findViewById(R.id.tvTime);
-            location = v.findViewById(R.id.tvLocation);
-            reminder = v.findViewById(R.id.tvReminder);
+            title = v.findViewById(R.id.tvTitle);
+            meta = v.findViewById(R.id.tvMeta);
         }
     }
 }

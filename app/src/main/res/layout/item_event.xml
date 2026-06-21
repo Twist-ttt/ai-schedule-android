@@ -1,26 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 日程列表项：玻璃卡片 + 左侧强调色条 + 涟漪反馈 -->
+<!-- 日程列表项：时间作左侧视觉锚点（大字 HH:mm）+ 标题 + 地点·提醒 复合副行
+     信息优先级：时间 > 标题 > 地点 > 提醒，扫读时第一眼即抓到"几点"。 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/Widget.MyApp.GlassContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="6dp"
-    android:layout_marginTop="6dp"
-    android:layout_marginEnd="6dp"
-    android:layout_marginBottom="6dp"
+    android:layout_marginStart="@dimen/spacing_card_gap_half"
+    android:layout_marginTop="@dimen/spacing_card_gap_half"
+    android:layout_marginEnd="@dimen/spacing_card_gap_half"
+    android:layout_marginBottom="@dimen/spacing_card_gap_half"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="14dp">
+    android:padding="@dimen/card_padding">
 
     <!-- 左侧强调色条 -->
     <View
         android:layout_width="4dp"
-        android:layout_height="match_parent"
-        android:layout_marginEnd="12dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="@dimen/spacing_card_gap"
         android:background="@color/glass_accent_teal" />
 
+    <!-- 时间锚点：HH:mm 大字（强调色），列表扫读的第一视觉落点 -->
+    <TextView
+        android:id="@+id/tvTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/spacing_card_gap"
+        android:minWidth="68dp"
+        android:textColor="@color/glass_accent"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <!-- 右侧：标题（主） + 地点·提醒（次） -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -31,32 +45,20 @@
             android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/glass_text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tvTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/glass_text_secondary"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/tvLocation"
+            android:id="@+id/tvMeta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/glass_text_secondary"
             android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/tvReminder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textColor="@color/glass_accent_teal"
-            android:textSize="12sp" />
     </LinearLayout>
 </LinearLayout>
