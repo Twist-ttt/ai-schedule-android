@@ -59,6 +59,11 @@ public class ScheduleRepository {
         return eventDao.getAll();
     }
 
+    /** 同步读全部日程（**须后台线程**；供自然语言修改/删除匹配候选）。 */
+    public List<EventRecord> getEventsAllSync() {
+        return eventDao.getAllSync();
+    }
+
     public LiveData<EventRecord> observeEvent(long id) {
         return eventDao.observeById(id);
     }
@@ -115,6 +120,23 @@ public class ScheduleRepository {
             ParseHistory h = historyDao.getByIdSync(historyId);
             if (h != null) {
                 h.isApplied = applied;
+                historyDao.update(h);
+            }
+        });
+    }
+
+    /**
+     * 动作落地后回写解析历史：isApplied 与（可选）封装好的 jsonResult（含 meta）。
+     * 内部自调度到后台线程，调用方可直接在主线程调用。
+     */
+    public void completeHistory(long historyId, boolean applied, String jsonResult) {
+        executors.diskIO().execute(() -> {
+            ParseHistory h = historyDao.getByIdSync(historyId);
+            if (h != null) {
+                h.isApplied = applied;
+                if (jsonResult != null) {
+                    h.jsonResult = jsonResult;
+                }
                 historyDao.update(h);
             }
         });

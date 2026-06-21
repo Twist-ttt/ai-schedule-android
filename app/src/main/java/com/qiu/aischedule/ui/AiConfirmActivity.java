@@ -7,8 +7,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.qiu.aischedule.R;
 import com.qiu.aischedule.data.local.entity.EventRecord;
@@ -18,10 +16,12 @@ import com.qiu.aischedule.util.AppExecutors;
 import com.qiu.aischedule.util.DateUtils;
 
 /**
- * AI 确认页。
- * - 由「AI 解析」进入：字段被自动回填（携带 historyId，保存时标记历史为已应用）；
- * - 由「手动填写」进入：字段可手动编辑（降级路径）。
- * 保存：后台线程写入数据库；若 reminderMinutes>0 且提醒时间在未来，则用 AlarmManager 设置提醒；
+ * AI 确认页（三种模式）：
+ * - {@link #MODE_AI}：由「AI 解析」(create) 进入，字段被自动回填；
+ * - {@link #MODE_MANUAL}：由「手动填写」进入，字段可手动编辑（降级路径）；
+ * - {@link #MODE_EDIT}：由自然语言修改（edit）进入，字段已合并好「原值+改动」预填。
+ * <p>保存：后台线程写入。AI/手动走 insert；EDIT 走 update——<b>先读原始 EventRecord 再 patch</b>，
+ * 保留 endTime/sourceText/status，且改开始时间时保持原时长（newEndTime = newStart + oldDuration）。
  * 保存后弹反馈对话框（明确告知是否已设提醒），点击「查看日程」进看板页。
  */
 public class AiConfirmActivity extends BaseActivity {
@@ -33,11 +33,14 @@ public class AiConfirmActivity extends BaseActivity {
     public static final String EXTRA_LOCATION = "extra_location";
     public static final String EXTRA_REMINDER = "extra_reminder";
     public static final String EXTRA_HISTORY_ID = "extra_history_id";
+    /** MODE_EDIT 时携带要修改的原日程 id。 */
+    public static final String EXTRA_EVENT_ID = "extra_event_id";
 
-    /** 进入模式：AI 解析回填 / 手动填写。决定标题与「原始输入」引用块是否显示。 */
+    /** 进入模式。决定标题与「原始输入」引用块是否显示。 */
     public static final String EXTRA_MODE = "extra_mode";
     public static final int MODE_AI = 0;
     public static final int MODE_MANUAL = 1;
+    public static final int MODE_EDIT = 2;
 
     private ScheduleRepository repo;
     private long historyId = -1L;
@@ -62,18 +65,20 @@ public class AiConfirmActivity extends BaseActivity {
         repo = ScheduleRepository.getInstance(this);
 
         Intent it = getIntent();
-        int mode = it.getIntExtra(EXTRA_MODE, MODE_MANUAL); // 漏传时退化为自洽的「新建」表单
-        boolean isAi = (mode == MODE_AI);
+        final int mode = it.getIntExtra(EXTRA_MODE, MODE_MANUAL); // 漏传时退化为「新建」表单
+        boolean showSource = (mode == MODE_AI || mode == MODE_EDIT);
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(isAi ? R.string.confirm_title : R.string.manual_confirm_title);
+            getSupportActionBar().setTitle(mode == MODE_EDIT
+                    ? R.string.confirm_edit_title
+                    : (mode == MODE_AI ? R.string.confirm_title : R.string.manual_confirm_title));
         }
 
         String sourceText = it.getStringExtra(EXTRA_SOURCE_TEXT);
-        // 「原始输入」引用块仅 AI 模式显示——手动填写就是普通新建表单
-        findViewById(R.id.sourceBlock).setVisibility(isAi ? View.VISIBLE : View.GONE);
+        // 「原始输入/修改指令」引用块：AI 回填与修改模式显示；手动填写隐藏
+        findViewById(R.id.sourceBlock).setVisibility(showSource ? View.VISIBLE : View.GONE);
         TextView tvSource = findViewById(R.id.tvSource);
-        if (isAi) {
+        if (showSource) {
             tvSource.setText((sourceText == null || sourceText.isEmpty())
                     ? getString(R.string.manual_entry_hint) : sourceText);
         }
@@ -81,8 +86,8 @@ public class AiConfirmActivity extends BaseActivity {
         EditText etTitle = findViewById(R.id.etTitle);
         etDate = findViewById(R.id.etDate);
         etTime = findViewById(R.id.etTime);
-        EditText etLocation = findViewById(R.id.etLocation);
-        EditText etReminder = findViewById(R.id.etReminder);
+        final EditText etLocation = findViewById(R.id.etLocation);
+        final EditText etReminder = findViewById(R.id.etReminder);
 
         // 默认值：当前日期 + 当前时间（结构化）
         dateMillis = DateUtils.todayStart();
@@ -94,7 +99,7 @@ public class AiConfirmActivity extends BaseActivity {
         etDate.setOnClickListener(v -> showDatePicker());
         etTime.setOnClickListener(v -> showTimePicker());
 
-        // AI 解析结果回填（如有）
+        // 回填（AI 回填或 EDIT 合并字段共用同一组 EXTRAs）
         if (it.hasExtra(EXTRA_TITLE)) etTitle.setText(it.getStringExtra(EXTRA_TITLE));
         if (it.hasExtra(EXTRA_DATE)) {
             long d = DateUtils.parseDateMillis(it.getStringExtra(EXTRA_DATE));
@@ -121,41 +126,99 @@ public class AiConfirmActivity extends BaseActivity {
                 Toast.makeText(this, R.string.toast_empty_title, Toast.LENGTH_SHORT).show();
                 return;
             }
-            long start = DateUtils.combine(dateMillis, hour, minute);
-            int reminder = parseInt(etReminder.getText().toString().trim());
+            final long start = DateUtils.combine(dateMillis, hour, minute);
+            final int reminder = parseInt(etReminder.getText().toString().trim());
+            final String location = etLocation.getText().toString().trim();
+            final int modeFinal = mode;
+            final String sourceFinal = sourceText == null ? "" : sourceText;
+            final long editId = it.getLongExtra(EXTRA_EVENT_ID, -1L);
 
-            EventRecord event = new EventRecord();
-            event.title = title;
-            event.startTime = start;
-            event.endTime = start;
-            event.location = etLocation.getText().toString().trim();
-            event.reminderMinutes = reminder;
-            event.sourceText = sourceText == null ? "" : sourceText;
-            event.status = getString(R.string.status_saved);
-
-            // 后台线程：写入 DB + 设置提醒
+            // 后台线程：写入 + 设置提醒
             AppExecutors.getInstance().diskIO().execute(() -> {
-                long newId = repo.insertEventSync(event);
-                boolean willRemind = false;
-                if (reminder > 0) {
-                    long trigger = start - reminder * 60000L;
-                    if (trigger > System.currentTimeMillis()) {
-                        ReminderScheduler.schedule(getApplicationContext(), newId, trigger);
-                        willRemind = true;
-                    }
+                if (modeFinal == MODE_EDIT) {
+                    saveEdit(editId, title, start, reminder, location);
+                } else {
+                    saveCreate(title, start, reminder, location, sourceFinal);
                 }
-                if (historyId != -1L) {
-                    repo.markHistoryApplied(historyId, true);
-                }
-                final boolean reminded = willRemind;
-                final int remindMin = reminder;
-                runOnUiThread(() -> showSavedDialog(reminded, remindMin));
             });
         });
     }
 
-    /** 保存成功反馈：明确告知是否已设置提醒，再跳看板页（取代裸 Toast）。 */
-    private void showSavedDialog(boolean willRemind, int reminderMinutes) {
+    /** 新建（AI/手动）：insert + 设提醒。 */
+    private void saveCreate(String title, long start, int reminder, String location, String sourceText) {
+        EventRecord event = new EventRecord();
+        event.title = title;
+        event.startTime = start;
+        event.endTime = start;
+        event.location = location;
+        event.reminderMinutes = reminder;
+        event.sourceText = sourceText;
+        event.status = getString(R.string.status_saved);
+
+        long newId = repo.insertEventSync(event);
+        boolean willRemind = false;
+        if (reminder > 0) {
+            long trigger = start - reminder * 60000L;
+            if (trigger > System.currentTimeMillis()) {
+                ReminderScheduler.schedule(getApplicationContext(), newId, trigger);
+                willRemind = true;
+            }
+        }
+        if (historyId != -1L) {
+            repo.markHistoryApplied(historyId, true);
+        }
+        final boolean reminded = willRemind;
+        final int remindMin = reminder;
+        runOnUiThread(() -> showSavedDialog(R.string.dialog_saved_title, reminded, remindMin));
+    }
+
+    /**
+     * 修改（EDIT）：先读原始 EventRecord 再 patch，保留 endTime/sourceText/status；
+     * 改开始时间时保持原时长（duration≤0 兜底 1 小时）。
+     */
+    private void saveEdit(long eventId, String title, long start, int reminder, String location) {
+        EventRecord orig = repo.getEventSync(eventId);
+        if (orig == null) {
+            runOnUiThread(() -> Toast.makeText(this, R.string.toast_update_failed, Toast.LENGTH_SHORT).show());
+            return;
+        }
+        long duration = orig.endTime - orig.startTime;
+        if (duration <= 0) {
+            duration = 3_600_000L; // 兜底 1 小时
+        }
+        orig.title = title;
+        orig.startTime = start;
+        orig.endTime = start + duration; // 改开始时间也保时长
+        orig.location = location;
+        orig.reminderMinutes = reminder;
+        // sourceText / status 不动（保留创建时来源；修改指令完整记在 ParseHistory）
+        repo.updateEvent(orig);
+        reschedule(orig);
+        if (historyId != -1L) {
+            repo.markHistoryApplied(historyId, true);
+        }
+        final boolean reminded = reminder > 0
+                && (start - reminder * 60000L > System.currentTimeMillis());
+        final int remindMin = reminder;
+        runOnUiThread(() -> showSavedDialog(R.string.dialog_updated_title, reminded, remindMin));
+    }
+
+    /** 更新后重设提醒：reminder>0 且未来则 schedule，否则 cancel（复制自 DetailActivity 范式）。 */
+    private void reschedule(EventRecord e) {
+        if (e.reminderMinutes > 0) {
+            long trigger = e.startTime - e.reminderMinutes * 60000L;
+            if (trigger > System.currentTimeMillis()) {
+                ReminderScheduler.schedule(this, e.id, trigger);
+            } else {
+                ReminderScheduler.cancel(this, e.id);
+            }
+        } else {
+            ReminderScheduler.cancel(this, e.id);
+        }
+    }
+
+    /** 保存/更新成功反馈：标题 + 三态（已提醒/未提醒/已过）。 */
+    private void showSavedDialog(int titleRes, boolean willRemind, int reminderMinutes) {
         String msg;
         if (willRemind) {
             msg = getString(R.string.dialog_saved_reminder_set, reminderMinutes);
@@ -165,7 +228,7 @@ public class AiConfirmActivity extends BaseActivity {
             msg = getString(R.string.dialog_saved_no_reminder);
         }
         new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.dialog_saved_title)
+                .setTitle(titleRes)
                 .setMessage(msg)
                 .setCancelable(false)
                 .setPositiveButton(R.string.dialog_saved_ok, (d, w) -> {

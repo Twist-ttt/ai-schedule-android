@@ -37,6 +37,16 @@
     <string name="summary_day_none">该日暂无日程</string>
     <string name="summary_next_prefix">最近：</string>
 
+    <!-- 自然语言修改/删除（统一入口） -->
+    <string name="confirm_edit_title">修改日程</string>
+    <string name="dialog_updated_title">日程已更新</string>
+    <string name="toast_update_failed">更新失败：日程可能已被删除</string>
+    <string name="toast_ai_unavailable">AI 解析失败，暂时无法通过一句话修改/删除日程。可进入「我的日程」手动操作。</string>
+    <string name="toast_no_match">没找到符合条件的日程（关键词：「%1$s」），试试加上日期或地点</string>
+    <!-- 以下为阶段 1 的临时引导，将在阶段 2/3 替换为真实功能 -->
+    <string name="toast_delete_pending">自然语言删除将在下个版本支持，暂请进入「我的日程」手动删除</string>
+    <string name="toast_multi_pending">找到多个相关日程，请用更具体的描述（如日期、地点）</string>
+
     <!-- 详情页 -->
     <string name="detail_title">日程详情</string>
 

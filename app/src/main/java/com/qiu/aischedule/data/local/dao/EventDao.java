@@ -34,6 +34,10 @@ public interface EventDao {
     @Query("SELECT * FROM events ORDER BY startTime ASC")
     LiveData<List<EventRecord>> getAll();
 
+    /** 同步读全部日程（须后台线程；供自然语言修改/删除在后台匹配候选）。 */
+    @Query("SELECT * FROM events ORDER BY startTime ASC")
+    List<EventRecord> getAllSync();
+
     @Query("SELECT * FROM events WHERE startTime >= :dayStart AND startTime < :dayEnd ORDER BY startTime ASC")
     LiveData<List<EventRecord>> getByDayRange(long dayStart, long dayEnd);
 
