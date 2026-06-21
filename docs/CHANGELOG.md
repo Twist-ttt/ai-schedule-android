@@ -380,3 +380,10 @@
 - **② AI 提示词与修改**：见 `prompts.md`「收尾整理」。
 - **③ 问题与解决**：确认 `.idea/` 仅 `.gitignore` 被跟踪，整体排除安全；`md2docx.py` 经核实为交付物生成工具而非测试脚本，予以保留；排查确认无 test 目录残留、无 `Log.d/v` 调试日志、无 TODO/FIXME（SecretStore 的 TEMP 按约定保留，测试 Key 已在 DeepSeek 注销）。
 - **验证**：`git status --short` 仅显示本次暂存文件，无 untracked 残留——工作区达到干净状态。
+
+### `chore: 移除非应用辅助脚本 md2docx.py`
+
+- **① 做了什么**：按用户要求删除根目录 `md2docx.py`（md→docx 转换脚本，非应用本身）。其生成的交付 docx（`项目设计文档.docx`、`AI提示词使用记录.docx`）已提交并保留。
+- **② AI 提示词与修改**：见 `prompts.md`「移除非应用脚本」。
+- **③ 问题与解决**：用户在打包交付前要求"确保所有非应用脚本删干净"；排查全项目脚本类文件，确认非应用脚本仅此一个（`gradlew`/`gradlew.bat` 为 Gradle wrapper，属应用构建，保留）。
+- **验证**：`git status` 工作区无 `md2docx.py`；docx 交付物仍在。
